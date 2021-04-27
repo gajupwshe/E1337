@@ -1,0 +1,25 @@
+.combo-box .cell{
+    -fx-text-fill: #2478E9;
+    /*-fx-font: 16px "Arial";*/
+}
+.combo-box .arrow{
+    -fx-background-color:#2478E9;
+}
+
+.radio-button.radio-button {
+  -jfx-selected-color:#2478E9;
+}
+.jfx-text-field
+{
+-fx-text-inner-color: #2478E9;
+}
+.jfx-date-picker > .arrow-button > .jfx-svg-glyph{
+    -fx-background-color: #2478E9;
+}
+/*.my-list-cell {
+    -fx-text-fill: blue;
+    -fx-font: 16px "Arial";
+     No alternate highlighting 
+    -fx-background-color: #FFF;
+}*/
+
