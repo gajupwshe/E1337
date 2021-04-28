@@ -458,7 +458,7 @@
                                                 <Font name="System Bold" size="13.0" />
                                             </font>
                                             <GridPane.margin>
-                                                <Insets left="110.0" />
+                                                <Insets left="90.0" />
                                             </GridPane.margin>
                                         </Text>
                                     </children>
@@ -510,7 +510,7 @@
                                                 <Font name="System Bold" size="13.0" />
                                             </font>
                                             <GridPane.margin>
-                                                <Insets left="140.0" />
+                                                <Insets left="100.0" />
                                             </GridPane.margin>
                                         </Text>
                                     </children>
