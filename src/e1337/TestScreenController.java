@@ -559,7 +559,7 @@ public class TestScreenController implements Initializable {
         cmbTestStd.setDisable(true);
         cmbValveType.setDisable(true);
         cmbTypeOfSealing.setDisable(true);
-        
+        cmbLeakageType.setDisable(true);
         txtValveSrNo.setEditable(false);
         txtBodyHeatno.setEditable(false);
         txtDiscHeatno.setEditable(false);
@@ -567,17 +567,21 @@ public class TestScreenController implements Initializable {
         txtPcd.setEditable(false);
         txtDocNo.setEditable(false);
         txtAllowable.setEditable(false);
+        radiobar.setDisable(true);
+        radiokg.setDisable(true);
+        radiopsi.setDisable(true);
 
     }
 
     private void enable_field() {
-       cmbTestType.setDisable(false);
+        cmbTestType.setDisable(false);
         cmbValveClass.setDisable(false);
         cmbValveSize.setDisable(false);
         cmbTestStd.setDisable(false);
         cmbValveType.setDisable(false);
         cmbTypeOfSealing.setDisable(false);
-        
+        cmbLeakageType.setDisable(false);
+
         txtValveSrNo.setEditable(true);
         txtBodyHeatno.setEditable(true);
         txtDiscHeatno.setEditable(true);
@@ -585,6 +589,10 @@ public class TestScreenController implements Initializable {
         txtPcd.setEditable(true);
         txtDocNo.setEditable(true);
         txtAllowable.setEditable(true);
+        
+        radiobar.setDisable(true);
+        radiokg.setDisable(true);
+        radiopsi.setDisable(true);
 
     }
 
