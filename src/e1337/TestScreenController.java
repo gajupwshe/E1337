@@ -25,13 +25,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -84,10 +82,23 @@ public class TestScreenController implements Initializable {
     @FXML
     private JFXTextField txtHoldingTime;
 
+    private LineChart<Number, Number> lineChart;
 //    int count_executer_status = 0;
 //    boolean initial_start_trend = true;
+
     String current_overall_timer = "2";
 
+    public static boolean start_trend_application = false;
+    private boolean start_trend = false;
+    //Trend Chart Component
+    private static final int MAX_DATA_POINTS = 25;
+    private int xSeriesData = 0;
+    private final XYChart.Series<Number, Number> series1 = new XYChart.Series<>();
+    private final XYChart.Series<Number, Number> series2 = new XYChart.Series<>();
+    private ExecutorService executor;
+    private final ConcurrentLinkedQueue<Number> dataQ1 = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<Number> dataQ2 = new ConcurrentLinkedQueue<>();
+    private NumberAxis xAxis;
     DatabaseHandler dh = new DatabaseHandler();
 
     Connection connect = dh.MakeConnection();
@@ -105,7 +116,7 @@ public class TestScreenController implements Initializable {
     private JFXTextField txtValveSrNo;
     private JFXTextField txtType;
 
-    String hydraulic, hydro, drain, stabi, tt, vt, vc, vs, hp, hold, vsn, type, bodyHeat, discHeat, noOfHole, pcd, docNo, allowableCount, tstd;
+    String hydraulic, hydro, drain, stabi, tt, vt, vc, vs, hp, hold, vsn, type,bodyHeat,discHeat,noOfHole,pcd,docNo,allowableCount,tstd;
     String pernsno, vstd, remark = "";
     @FXML
     private JFXTextField txtCycleStatus;
@@ -120,7 +131,9 @@ public class TestScreenController implements Initializable {
     Colors color = new Colors();
     @FXML
     private Text textHydro;
-//    private Text textTrend;
+    @FXML
+    private Text textTrend;
+    @FXML
     private HBox hboxtrend;
     private HBox hboxTrendText;
     private VBox vboxStatus;
@@ -129,6 +142,8 @@ public class TestScreenController implements Initializable {
     @FXML
     private JFXTextField txtOverAllTime;
 
+    @FXML
+    private VBox vboxtrend;
     private JFXTextField txtvType;
 //    @FXML
 //    private JFXTextField txtRoomTemp1;
@@ -154,6 +169,8 @@ public class TestScreenController implements Initializable {
 
     @FXML
     private JFXTextField txtvendr;
+    @FXML
+    private JFXDrawer drawer1;
     @FXML
     private JFXComboBox<String> cmbPressuregage;
     @FXML
@@ -191,7 +208,8 @@ public class TestScreenController implements Initializable {
     private Gauge GaugeActualHydraulic;
     @FXML
     private JFXTextField txtResult;
-
+    @FXML
+    private JFXTextField txtStabilizationr;
 //    @FXML
 //    private JFXTextField txtHoldingTimer;
     @FXML
@@ -230,30 +248,6 @@ public class TestScreenController implements Initializable {
     private JFXTextField txtDocNo;
     @FXML
     private JFXTextField txtPcd;
-    @FXML
-    private VBox vboxTxt;
-    @FXML
-    private JFXTextField txtStabilizationTimer;
-
-    //Trend Chart Component
-    private final int MAX_DATA_POINTS = 50;
-    private int xSeriesData = 0;
-    private final XYChart.Series<Number, Number> series1 = new XYChart.Series<>();
-    private final XYChart.Series<Number, Number> series2 = new XYChart.Series<>();
-    private final XYChart.Series<Number, Number> series3 = new XYChart.Series<>();
-    private ExecutorService executor;
-    private final ConcurrentLinkedQueue<Number> dataQ1 = new ConcurrentLinkedQueue<>();
-    private final ConcurrentLinkedQueue<Number> dataQ2 = new ConcurrentLinkedQueue<>();
-
-    private final ConcurrentLinkedQueue<Number> dataQ3 = new ConcurrentLinkedQueue<>();
-    private NumberAxis xAxis;
-
-    private boolean start_trend = false;
-
-    LineChart<Number, Number> lineChart;
-
-    @FXML
-    private JFXDrawer drawer;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -268,17 +262,12 @@ public class TestScreenController implements Initializable {
 
         //set Editable false some testing parameter
         txtCycleStatus.setEditable(false);
-        txtStabilizationTimer.setEditable(false);
+        txtStabilizationr.setEditable(false);
         txtHoldingTimer.setEditable(false);
         txtDrainTimer.setEditable(false);
         txtOverAllTime.setEditable(false);
         txtResult.setEditable(false);
         txtAtcualBubble.setEditable(false);
-        cmbPressuregage.setVisible(false);
-        txtrange.setVisible(false);
-        txtvendr.setVisible(false);
-        cmbModel.setVisible(false);
-        txtinvalid.setVisible(false);
         String user_type = Session.get("user_type");
         if (user_type.equals("admin")) {
             btnAdmin.setVisible(true);
@@ -286,7 +275,6 @@ public class TestScreenController implements Initializable {
         } else {
             btnAdmin.setVisible(false);
         }
-        date_time();
         Background_Processes.insert_plc_data("python E:\\E1337\\python_plc\\insert_init_test_tag.py", false, true);
         String user_name = Session.get("user");
         try {
@@ -302,12 +290,14 @@ public class TestScreenController implements Initializable {
 //            txtremark.setDisable(false);
             Gaugehydro.setVisible(false);
             textHydro.setVisible(false);
-//            hboxtrend.setVisible(false);
-//            textTrend.setVisible(false);
+            hboxtrend.setVisible(false);
+            textTrend.setVisible(false);
             Gaugehydro.setVisible(false);
             textHydro1.setVisible(false);
-//            hboxtrend.setVisible(false);
-//            textTrend.setVisible(false);
+            hboxtrend.setVisible(false);
+            textTrend.setVisible(false);
+            Date dateInstance = new Date();
+            txtdate.setText("" + (dateInstance.getDate() + "/" + (dateInstance.getMonth() + 1) + "/" + (dateInstance.getYear() + 1900)));
 
         } catch (SQLException ex) {
             Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
@@ -317,22 +307,6 @@ public class TestScreenController implements Initializable {
     }
     String pu;
     int leak_no, cust_flag = 1, test_no = 1;
-
-    private void date_time() {
-        time.scheduleAtFixedRate(date, 0, 1000);
-    }
-
-    Timer time = new Timer();
-
-    TimerTask date = new TimerTask() {
-        @Override
-        public void run() {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-            LocalDateTime now = LocalDateTime.now();
-            txtdate.setText("Date:" + dtf.format(now));
-
-        }
-    };
 
     public void InitialDataLoad() throws SQLException {
         //test type 
@@ -386,7 +360,7 @@ public class TestScreenController implements Initializable {
                 cmbTypeOfSealing.getSelectionModel().select(Integer.parseInt(rs1.getString("type_of_sealing")));
                 cmbTestStd.getSelectionModel().select(Integer.parseInt(rs1.getString("test_standards")));
 
-                if (rs1.getString("test_standards").equals("3")) {
+                if (rs1.getString("test_standards").equals("1")) {
                     cust_flag = 0;
                     txtHydroSetPressure.setEditable(true);
                     txtHydraulicSetPressure.setEditable(true);
@@ -409,8 +383,9 @@ public class TestScreenController implements Initializable {
                 txtHydraulicSetPressure.setText(rs1.getString("hydraulic_set_pressure"));
 
                 bar_psi_kg(rs1.getString("bar_psi_kgcm"));
-                leakage_type();
+
             }
+            leakage_type();
 
             ResultSet rs_data = dh.getData("SELECT * FROM valve_data ORDER BY id DESC LIMIT 1", connect);
             if (rs_data.next()) {
@@ -424,7 +399,6 @@ public class TestScreenController implements Initializable {
     private void Initial_Dropdowns_Data() {
         String q = "SELECT vt.valve_type,vt.write_value AS type_write,tos.type_of_sealing,tos.write_value AS sealing_write,ts.test_standards,ts.write_value AS standard_write,vst.valve_standards,vst.write_value AS valve_standard_write FROM valve_type vt LEFT JOIN type_of_sealing tos ON tos.type_of_sealing_id = vt.valve_type_id LEFT JOIN test_standards ts ON ts.test_standards_id = vt.valve_type_id LEFT JOIN valve_standards vst ON vst.valve_standards_id = vt.valve_type_id;";
         try {
-            System.out.println("q : " + q);
             ResultSet rs = dh.getData(q, connect);
             while (rs.next()) {
                 if (rs.getString("valve_type") == null || rs.getString("valve_type").equals("")) {
@@ -435,17 +409,11 @@ public class TestScreenController implements Initializable {
                 } else {
                     cmbTypeOfSealing.getItems().add(Integer.parseInt(rs.getString("sealing_write")), rs.getString("type_of_sealing"));
                 }
-//                
-//                if (rs.getString("test_standards") == null || rs.getString("test_standards").equals("")) {
-//                } else {
-//                    cmbTestStd.getItems().add(Integer.parseInt(rs.getString("standard_write")), rs.getString("test_standards"));
-//                }
+                if (rs.getString("test_standards") == null || rs.getString("test_standards").equals("")) {
+                } else {
+                    cmbTestStd.getItems().add(Integer.parseInt(rs.getString("standard_write")), rs.getString("test_standards"));
+                }
 
-            }
-
-            ResultSet rs_std = dh.getData("SELECT test_standards,write_value FROM test_standards ORDER BY test_standards_id ASC", connect);
-            while (rs_std.next()) {
-                cmbTestStd.getItems().add(Integer.parseInt(rs_std.getString("write_value")), rs_std.getString("test_standards"));
             }
 
         } catch (NumberFormatException | SQLException e) {
@@ -460,7 +428,7 @@ public class TestScreenController implements Initializable {
         cmbValveClass.getItems().clear();
         cmbValveSize.getItems().clear();
         //Valve_class
-        String vc = "SELECT vc.valve_class FROM valve_class vc;";
+        String vc = "SELECT vc.valve_class FROM valve_class ;";
         System.out.println(vc);
         ResultSet rs_vc = dh.getData(vc, connect);
         while (rs_vc.next()) {
@@ -554,38 +522,48 @@ public class TestScreenController implements Initializable {
 
     private void disable_field() {
         cmbTestType.setDisable(true);
+//        radioA.setEditable(true);
+//        radioB.setEditable(true);
         cmbValveClass.setDisable(true);
         cmbValveSize.setDisable(true);
         cmbTestStd.setDisable(true);
         cmbValveType.setDisable(true);
-        cmbTypeOfSealing.setDisable(true);
-        
+        cmbPressuregage.setDisable(true);
+//        cmbValveMat.setDisable(true);
+        txtHoldingTime.setEditable(false);
+        txtHydroSetPressure.setEditable(false);
+
         txtValveSrNo.setEditable(false);
-        txtBodyHeatno.setEditable(false);
-        txtDiscHeatno.setEditable(false);
-        txtNoOfHole.setEditable(false);
-        txtPcd.setEditable(false);
-        txtDocNo.setEditable(false);
-        txtAllowable.setEditable(false);
+        txtvendr.setEditable(true);
+
+        radiobar.setDisable(true);
+        radiopsi.setDisable(true);
+//        radiompas.setEditable(true);
+        txtvendr.setEditable(false);
 
     }
 
     private void enable_field() {
-       cmbTestType.setDisable(false);
+        cmbTestType.setDisable(false);
+//        radioA.setEditable(true);
+//        radioB.setEditable(true);
         cmbValveClass.setDisable(false);
         cmbValveSize.setDisable(false);
         cmbTestStd.setDisable(false);
         cmbValveType.setDisable(false);
-        cmbTypeOfSealing.setDisable(false);
-        
-        txtValveSrNo.setEditable(true);
-        txtBodyHeatno.setEditable(true);
-        txtDiscHeatno.setEditable(true);
-        txtNoOfHole.setEditable(true);
-        txtPcd.setEditable(true);
-        txtDocNo.setEditable(true);
-        txtAllowable.setEditable(true);
+        cmbPressuregage.setDisable(false);
+//        cmbValveMat.setDisable(true);
+        txtHoldingTime.setEditable(true);
+        txtHydroSetPressure.setEditable(true);
 
+        txtValveSrNo.setEditable(true);
+
+        txtvendr.setEditable(true);
+
+        radiobar.setDisable(false);
+        radiopsi.setDisable(false);
+//        radiompas.setEditable(true);
+        txtvendr.setEditable(true);
     }
 
     private void is_empty() {
@@ -595,13 +573,15 @@ public class TestScreenController implements Initializable {
         vc = cmbValveClass.getSelectionModel().getSelectedItem();
         vs = cmbValveSize.getSelectionModel().getSelectedItem();
         tstd = cmbTestStd.getSelectionModel().getSelectedItem();
-        vsn = txtValveSrNo.getText();
-        bodyHeat = txtBodyHeatno.getText();
-        discHeat = txtDiscHeatno.getText();
-        noOfHole = txtNoOfHole.getText();
-        pcd = txtPcd.getText();
-        docNo = txtDocNo.getText();
-        allowableCount = txtAllowable.getText();
+        vsn=txtValveSrNo.getText();
+        bodyHeat=txtBodyHeatno.getText();
+        discHeat=txtDiscHeatno.getText();
+        noOfHole=txtNoOfHole.getText();
+        pcd=txtPcd.getText();
+        docNo=txtDocNo.getText();
+        allowableCount=txtAllowable.getText();
+        
+        
 
     }
 
@@ -810,17 +790,6 @@ public class TestScreenController implements Initializable {
                             max = rs.getString("max_gauge");
                             green = rs.getString("green_gauge");
                             invalid = rs.getString("invalid");
-                            if (invalid.equals("1")) {
-
-                                Platform.runLater(() -> {
-                                    txtinvalid.setVisible(true);
-                                });
-                            } else {
-                                Platform.runLater(() -> {
-                                    txtinvalid.setVisible(false);
-                                });
-                            }
-//                            invalid = rs.getString("invalid");
 
 //Storing Value's of Machine Parameters: End
                             try {
@@ -842,6 +811,33 @@ public class TestScreenController implements Initializable {
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 System.out.println("EXCEPTION IN SETTING VALUE OF GAUGES IN DATA_UPDATE_THREAD : " + e.getMessage());
+                            }
+
+                            try {
+                                try {
+
+                                    if (ToolKit.isNull(overall_time)) {
+                                    } else {
+
+                                        if (overall_time.equals(current_overall_timer)) {
+                                        } else {
+//                                                System.out.println("overall_time : " + overall_time);
+                                            Platform.runLater(() -> {
+                                                txtOverAllTime.setText(overall_time);
+                                            });
+                                            current_overall_timer = overall_time;
+                                        }
+                                    }
+
+//Updating Overall Time Value: End
+                                } catch (ArrayIndexOutOfBoundsException e) {
+                                    e.printStackTrace();
+
+                                    System.out.println("EXCEPTION IN UPDATE OVERALL TIME DATA_UPDATE_THREAD : " + e.getMessage());
+                                }
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
 
                             try {
@@ -949,8 +945,7 @@ public class TestScreenController implements Initializable {
                 Platform.runLater(() -> {
                     txtMode.setText("Emergency Mode");
                     current_machine_mode = "0";
-                    txtdate.setFill(Color.web("red"));
-                    txtMode.setFill(Color.web("red"));
+                    txtdate.setFill(Color.web("#0099FF"));
                 });
 
                 break;
@@ -959,7 +954,6 @@ public class TestScreenController implements Initializable {
                     txtMode.setText("Alarm Mode");
 //                Platform.runLater(()->{
                     current_machine_mode = "1";
-                    txtMode.setFill(Color.web("Red"));
                     txtdate.setFill(Color.web("Red"));
 
                 });
@@ -969,16 +963,14 @@ public class TestScreenController implements Initializable {
                     txtMode.setText("Manual Mode");
 
                     current_machine_mode = "2";
-                    txtdate.setFill(Color.web("#0099FF"));
-                    txtMode.setFill(Color.web("#0099FF"));
+                    txtdate.setFill(Color.web("Blue"));
                 });
                 break;
             case "3":
                 Platform.runLater(() -> {
                     txtMode.setText("Auto Mode");
                     current_machine_mode = "3";
-                    txtdate.setFill(Color.web("#0099FF"));
-                    txtMode.setFill(Color.web("#0099FF"));
+                    txtdate.setFill(Color.web("Blue"));
 
                 });
                 break;
@@ -1029,27 +1021,15 @@ public class TestScreenController implements Initializable {
                     || ToolKit.isNull(vt)
                     || ToolKit.isNull(vc)
                     || ToolKit.isNull(vs)
-                    //                    || ToolKit.isNull(ts)
+                    || ToolKit.isNull(ts)
                     || ToolKit.isNull(tstd)
                     || ToolKit.isNull(vsn)
                     || ToolKit.isNull(bodyHeat)
                     || ToolKit.isNull(discHeat)
                     || ToolKit.isNull(noOfHole)
                     || ToolKit.isNull(pcd)
-                    || ToolKit.isNull(docNo) //                    || ToolKit.isNull(allowableCount)
-                    ) {
-
-                check_text_empty_fields(txtValveSrNo, vsn);
-                check_text_empty_fields(txtBodyHeatno, bodyHeat);
-                check_text_empty_fields(txtDiscHeatno, discHeat);
-                check_text_empty_fields(txtNoOfHole, noOfHole);
-                check_text_empty_fields(txtPcd, pcd);
-                check_text_empty_fields(txtDocNo, docNo);
-                check_combo_empty_fields(cmbTestStd, tstd);
-                check_combo_empty_fields(cmbTestType, tt);
-                check_combo_empty_fields(cmbValveClass, vc);
-                check_combo_empty_fields(cmbValveType, vt);
-                check_combo_empty_fields(cmbValveSize, vs);
+                    || ToolKit.isNull(docNo)
+                    || ToolKit.isNull(allowableCount)) {
 
                 Dialog.showForSometime("", "Please provide appropriate data", "Alert", 450, 10);
                 dh.execute("UPDATE writedropdownplc set cycle_start='4' WHERE id='1' ", connect);
@@ -1063,33 +1043,52 @@ public class TestScreenController implements Initializable {
 
                             cycleStatusThread();
                             you_can = false;
-                            dh.execute("UPDATE writedropdownplc set cycle_start='0' WHERE id='1' ", connect);
+                            String cmd = "python E:\\E1257\\python_plc\\write_plc_word.py 18 0 0 ";
+                            System.out.println("cmd..." + cmd);
+                            Process child = Runtime.getRuntime().exec(cmd);
+                            try {
+                                child.waitFor();
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
 
-                            String select_data = "SELECT * FROM `valve_data` ORDER BY id DESC LIMIT 1";
+                            String select_data = "SELECT * FROM `valve_data` ORDER BY valve_data_id DESC LIMIT 1";
                             ResultSet rs_sele = dh.getData(select_data, connect);
-
                             if (rs_sele.next()) {
                                 test_no = Integer.parseInt(rs_sele.getString("test_no"));
                                 test_no++;
-                                System.out.println("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW())");
-                                dh.execute("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW())", connect);
 
                                 //insert data into initia_vala_data
 //                                String sp = " insert_test_init_sp('" + tt + "','NA','" + vt + "','" + vs + "','" + vc + "','" + cmbTypeOfSealing.getSelectionModel().getSelectedItem() + "','" + ts + "','" + st + "','" + ht + "','NA','" + dt + "','" + hsp + "','" + csp + "','" + pu + "','0','" + txtHydroSetPressure.getText() + "','" + txtHydraulicSetPressure.getText() + "','" + vsn + "','NA','NA','NA','" + pro + "','" + cust + "','" + operator_name + "','NA'," + test_no + ",'NA','NA','" + txtBodyHeatno.getText() + "','" + cmbPressuregage.getSelectionModel().getSelectedItem() + "','" + txtvendr.getText() + "','" + txtpono.getText() + "','" + txtjobno.getText() + "')";
 //                                dh.execute_sp(sp, connect);
+
                             } else {
-                                System.out.println("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW())");
-                                dh.execute("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW())", connect);
                                 //insert data into initia_vala_data
 //                                String sp = " insert_test_init_sp('" + tt + "','NA','" + vt + "','" + vs + "','" + vc + "','" + cmbTypeOfSealing.getSelectionModel().getSelectedItem() + "','" + ts + "','" + st + "','" + ht + "','NA','" + dt + "','" + hsp + "','" + csp + "','" + pu + "','0','" + txtHydroSetPressure.getText() + "','" + txtHydraulicSetPressure.getText() + "','" + vsn + "','NA','NA','NA','" + pro + "','" + cust + "','" + operator_name + "','NA'," + test_no + ",'NA','NA','" + txtBodyHeatno.getText() + "','" + cmbPressuregage.getSelectionModel().getSelectedItem() + "','" + txtvendr.getText() + "','" + txtpono.getText() + "','" + txtjobno.getText() + "')";
 //                                dh.execute_sp(sp, connect);
                             }
 
-                            trend_initialize();
-                            start_trend();
-                            start_trend = true;
-                            guage_initialize(0, Integer.parseInt(max), Integer.parseInt(green), pu);
+//                            trend_initialize();
+                            String[] split_gauge = ToolKit.readpy("python E:\\E1257\\python_plc\\gauge_setup_hydro.py").split("/");
+                            Thread.sleep(50);
+                            String psu = "";
+                            if (radiobar.isSelected()) {
+                                psu = "bar";
+                            } else if (radiopsi.isSelected()) {
+                                psu = "psi";
+                            } else {
+                                psu = "kg/sqcm";
+                            }
+                            guage_initialize(0, Integer.parseInt(split_gauge[1]), Integer.parseInt(split_gauge[2]), psu);
 
+//                    Background_Processes.insert_plc_data("python E:\\E1257\\python_plc\\inser_tag.py localhost root abc E1024 truncate_test_tags_sp insert_test_tags_sp", false, true);
+//                            start_trend = true;
+//                            disable_field();
+                            //Trend Start
+//                            start_trend();
+//                            textTrend.setVisible(true);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (SQLException ex) {
                             Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (IOException ex) {
@@ -1097,8 +1096,21 @@ public class TestScreenController implements Initializable {
                         }
                     } else if (option.get() == ButtonType.NO) {
                         try {
-                            dh.execute("UPDATE writedropdownplc set cycle_start='4' WHERE id='1' ", connect);
-                        } catch (SQLException ex) {
+                            System.out.println("NO PRESSED");
+
+                            Thread.sleep(100);
+                            String cmd = "python E:\\E1257\\python_plc\\write_plc_word.py 18 0 4 ";
+                            System.out.println("cmd..." + cmd);
+                            Process child = Runtime.getRuntime().exec(cmd);
+                            try {
+                                child.waitFor();
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+//                    Session.set("Trend_Status", "Stopped");
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IOException ex) {
                             Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
@@ -1208,33 +1220,6 @@ public class TestScreenController implements Initializable {
                         e.printStackTrace();
                         System.out.println("EXCEPTION IN CYCLE STATUS UPDATE cycleStatusThread : " + e.getLocalizedMessage());
                     }
-                    try {
-                        try {
-
-                            if (ToolKit.isNull(overall_time)) {
-                            } else {
-
-                                if (overall_time.equals(current_overall_timer)) {
-                                } else {
-//                                                System.out.println("overall_time : " + overall_time);
-                                    Platform.runLater(() -> {
-                                        txtOverAllTime.setText(overall_time);
-                                    });
-                                    current_overall_timer = overall_time;
-
-                                }
-                            }
-
-//Updating Overall Time Value: End
-                        } catch (ArrayIndexOutOfBoundsException e) {
-                            e.printStackTrace();
-
-                            System.out.println("EXCEPTION IN UPDATE OVERALL TIME DATA_UPDATE_THREAD : " + e.getMessage());
-                        }
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
 
                     try {
                         //getting All timers
@@ -1245,7 +1230,7 @@ public class TestScreenController implements Initializable {
                                     } else {
                                         try {
                                             Platform.runLater(() -> {
-                                                txtStabilizationTimer.setText(s_time);
+                                                txtStabilizationr.setText(s_time);
                                             });
                                             current_stabilization_timer = s_time;
                                         } catch (Exception e) {
@@ -1666,7 +1651,7 @@ public class TestScreenController implements Initializable {
 
     private void empty_timers() {
         txtCycleStatus.setText("");
-        txtStabilizationTimer.setText("");
+        txtStabilizationr.setText("");
         txtHoldingTimer.setText("");
         txtDrainTimer.setText("");
         txtOverAllTime.setText("");
@@ -1725,6 +1710,13 @@ public class TestScreenController implements Initializable {
     private void trend_initialize() throws IOException {
         //            AnchorPane trend = FXMLLoader.load(getClass().getResource("TrendScreen.fxml"));
         try {
+
+            System.out.println("in");
+            hboxtrend.setVisible(true);
+//              hboxTrendText.setVisible(true);
+//              vboxStatus.setVisible(true);
+//              lineChart.setVisible(true);
+            System.out.println("in function");
             xAxis = new NumberAxis(0, 1000, 1);
             xAxis.setForceZeroInRange(true);
             xAxis.setAutoRanging(true);
@@ -1732,6 +1724,16 @@ public class TestScreenController implements Initializable {
             xAxis.setTickMarkVisible(true);
             xAxis.setMinorTickVisible(true);
             yAxis = new NumberAxis();
+
+            lineChart.setAnimated(false);
+            lineChart.setTitle("");
+            lineChart.getData().clear();
+
+            series1.getData().clear();
+            series2.getData().clear();
+
+            series1.getData().removeAll();
+            series2.getData().removeAll();
 
             // Create a LineChart
             lineChart = new LineChart<Number, Number>(xAxis, yAxis) {
@@ -1741,38 +1743,14 @@ public class TestScreenController implements Initializable {
                 }
             };
 //
-            String test_type = cmbTestType.getSelectionModel().getSelectedItem();
+//            String test_type = txtTestType.getText();
             lineChart.setAnimated(false);
             lineChart.setTitle("");
-            lineChart.getData().clear();
-//            if (!lineChart.getData().isEmpty()) {
-//                System.out.println("Remove Series");
-//        lineChart.getData().remove(/*(lineChart.getData().size()-1)*/0);
-//    }
-            series1.getData().clear();
-            series2.getData().clear();
-            series3.getData().clear();
-            series1.getData().removeAll();
-            series2.getData().removeAll();
-            series3.getData().removeAll();
             lineChart.setHorizontalGridLinesVisible(true);
-            if (test_type.equals("HYDROSTATIC SHELL") || test_type.equals("BACK SEAT TEST")) {
-                series1.setName("Hydro Pressure");
-                series3.setName("Hydraulic Pressure");
-
-                lineChart.getData().addAll(series1, series3);
-
-            } else {
-                // Set Name for Series
-                series1.setName("Hydro Pressure A Side");
-                series2.setName("Hydro Pressure B Side");
-                series3.setName("Hydraulic Pressure");
-                // Add Chart Series
-                lineChart.getData().addAll(series1, series3, series2);
-            }
-            drawer.setMinWidth(400);
-            drawer.setSidePane(lineChart);
-            drawer.setOverLayVisible(false);
+            series1.setName("Hydro Pressure ");
+            lineChart.getData().addAll(series1);
+            drawer1.setSidePane(lineChart);
+            drawer1.setOverLayVisible(false);
 
         } catch (Exception e) {
         }
@@ -1782,8 +1760,7 @@ public class TestScreenController implements Initializable {
     boolean initial_start_trend = true;
 
     private void start_trend() {
-        //For UI updation
-//        Platform.runLater(() -> {
+
         if (initial_start_trend) {
             initial_start_trend = false;
         } else {
@@ -1791,16 +1768,12 @@ public class TestScreenController implements Initializable {
             System.out.println("Clearing dataQue");
             dataQ1.clear();
             dataQ2.clear();
-            dataQ3.clear();
-//            Platform.runLater(() -> {
+
             series1.getData().clear();
             series2.getData().clear();
-            series3.getData().clear();
             series1.getData().removeAll(dataQ1);
             series2.getData().removeAll(dataQ2);
-            series3.getData().removeAll(dataQ3);
 
-//            });
         }
 
         xAxis.setLowerBound(0);
@@ -1822,95 +1795,6 @@ public class TestScreenController implements Initializable {
             prepareTimeline();
         });
 //         Runtime.getRuntime().gc();
-    }
-
-    private class AddToQueue implements Runnable {
-
-        String query = "SELECT * FROM initialinitmain ORDER BY id DESC LIMIT 1";
-        ResultSet rs;
-
-        @Override
-        public void run() {
-//run after some time 
-            Platform.runLater(() -> {
-                try {
-                    // add a item of random data to queue.
-                    if (start_trend) {
-                        rs = dh.getData(query, connect);
-                        if (rs.next()) {
-                            double dq1 = 0.0;
-                            double dq2 = 0.0;
-                            double dq3 = 0.0;
-                            try {
-                                dq1 = Double.parseDouble(rs.getString("hydro_actual_a_pressure"));
-                                dq2 = Double.parseDouble(rs.getString("hydro_actual_b_pressure"));
-                                dq3 = Double.parseDouble(rs.getString("hydraulic_actual_pressure"));
-                            } catch (Exception e) {
-                                System.err.println("This is an Error of Trend data where dq1 and dq2 defined: " + e.getMessage());
-                            }
-//                            System.out.println("dq1 : " + dq1);
-                            dataQ1.add(dq1);
-                            dataQ2.add(dq2);
-                            dataQ3.add(dq3);
-                        }
-
-                        Thread.sleep(100);
-                        //System.out.println("running");
-                        executor.execute(this);
-                    } else {
-                        if (count_executer_status > 1) {
-                            //System.out.println("Stopping");
-                            executor.shutdown();
-                        } else {
-
-                        }
-
-                    }
-
-                } catch (Exception ex) {
-                    System.err.println("This is an Error of Trend data in second try below dq1 and dq2 defined: " + ex.getMessage());
-
-                    executor.shutdown();
-                    //kill the thread
-//                 Thread.interrupted();
-                }
-            });
-        }
-
-    }
-
-    //-- Timeline gets called in the JavaFX Main thread
-    private void prepareTimeline() {
-
-        // Every frame to take any data from queue and add to chart
-        new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                addDataToSeries();
-            }
-        }.start();
-
-    }
-
-    private void addDataToSeries() {
-        for (int i = 0; i < 20; i++) {
-            //-- add 20 numbers to the plot+
-            if (dataQ1.isEmpty()) {
-                break;
-            }
-//            Platform.runLater(() -> {
-            series1.getData().add(new XYChart.Data<>(Integer.parseInt(current_overall_timer), dataQ1.remove()));
-            series2.getData().add(new XYChart.Data<>(Integer.parseInt(current_overall_timer), dataQ2.remove()));
-            series3.getData().add(new XYChart.Data<>(Integer.parseInt(current_overall_timer), dataQ3.remove()));
-//            });
-        }
-//        // update
-        Platform.runLater(() -> {
-            xAxis.setLowerBound(xSeriesData - MAX_DATA_POINTS);
-            xAxis.setUpperBound(xSeriesData - 1);
-
-        });
-
     }
 
     private void btnBubbleAction(ActionEvent event) {
@@ -1987,6 +1871,7 @@ public class TestScreenController implements Initializable {
         }
     }
 
+    @FXML
     private void txtStabilizationAction(ActionEvent event) throws InterruptedException {
         try {
             String s_time1 = txtStabilization.getText();
@@ -2038,24 +1923,104 @@ public class TestScreenController implements Initializable {
 
     @FXML
     private void txtheatnoKeyPressed(KeyEvent event) {
-//        try {
-//            ResultSet rs_p = dh.getData("SELECT serial FROM gauge_data WHERE description='" + cmbValveClass.getSelectionModel().getSelectedItem() + "'", connect);
-//            System.out.println("SELECT serial FROM gauge_data WHERE description='" + cmbValveClass.getSelectionModel().getSelectedItem() + "'");
-//            cmbPressuregage.getItems().clear();
-//            while (rs_p.next()) {
-//                cmbPressuregage.getItems().addAll(rs_p.getString("serial"));
-//            }
-//        } catch (SQLException ex) {
-//            Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        try {
+            ResultSet rs_p = dh.getData("SELECT serial FROM gauge_data WHERE description='" + cmbValveClass.getSelectionModel().getSelectedItem() + "'", connect);
+            System.out.println("SELECT serial FROM gauge_data WHERE description='" + cmbValveClass.getSelectionModel().getSelectedItem() + "'");
+            cmbPressuregage.getItems().clear();
+            while (rs_p.next()) {
+                cmbPressuregage.getItems().addAll(rs_p.getString("serial"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
     private void cmbModelAction(ActionEvent event) {
     }
 
-    @FXML
-    private void txtStabilizationTimeAction(ActionEvent event) {
+    private class AddToQueue implements Runnable {
+
+        String query = "SELECT * FROM `trend_data` WHERE `test_no`='" + test_no + "' ORDER BY id DESC LIMIT 1";
+
+        ResultSet rs;
+
+        @Override
+        public void run() {
+//run after some time 
+            Platform.runLater(() -> {
+                try {
+                    // add a item of random data to queue.
+                    if (start_trend) {
+                        rs = dh.getData(query, connect);
+                        if (rs.next()) {
+                            double dq1 = 0.0;
+                            double dq2 = 0.0;
+                            try {
+                                dq1 = Double.parseDouble(rs.getString("pressure"));
+                                dq2 = Double.parseDouble(rs.getString("pressure"));
+                            } catch (Exception e) {
+                                System.err.println("This is an Error of Trend data where dq1 and dq2 defined: " + e.getMessage());
+                            }
+
+                            dataQ1.add(dq1);
+                            dataQ2.add(dq2);
+                        }
+
+                        Thread.sleep(100);
+                        //System.out.println("running");
+                        executor.execute(this);
+                    } else {
+                        if (count_executer_status > 1) {
+                            //System.out.println("Stopping");
+                            executor.shutdown();
+                        } else {
+
+                        }
+
+                    }
+
+                } catch (Exception ex) {
+                    System.err.println("This is an Error of Trend data in second try below dq1 and dq2 defined: " + ex.getMessage());
+
+                    executor.shutdown();
+                    //kill the thread
+//                 Thread.interrupted();
+                }
+            });
+        }
+
+    }
+
+    private void prepareTimeline() {
+
+        // Every frame to take any data from queue and add to chart
+        new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                addDataToSeries();
+            }
+        }.start();
+
+    }
+
+    private void addDataToSeries() {
+        for (int i = 0; i < 20; i++) {
+            //-- add 20 numbers to the plot+
+            if (dataQ1.isEmpty()) {
+                break;
+            }
+            series1.getData().add(new XYChart.Data<>(Integer.parseInt(current_overall_timer), dataQ1.remove()));
+            series2.getData().add(new XYChart.Data<>(Integer.parseInt(current_overall_timer), dataQ2.remove()));
+
+        }
+
+//        // update
+        Platform.runLater(() -> {
+            xAxis.setLowerBound(xSeriesData - MAX_DATA_POINTS);
+            xAxis.setUpperBound(xSeriesData - 1);
+
+        });
 
     }
 
@@ -2252,7 +2217,7 @@ public class TestScreenController implements Initializable {
         Gaugehydro.clearSections();
         Gaugehydro.setVisible(false);
         start_trend = false;
-//        textTrend.setVisible(false);
+        textTrend.setVisible(false);
         textHydro.setVisible(false);
         textHydro1.setVisible(false);
         hboxtrend.setVisible(false);
@@ -2292,13 +2257,6 @@ public class TestScreenController implements Initializable {
         int index = cmbValveType.getSelectionModel().getSelectedIndex();
         System.out.println("UPDATE writedropdownplc set valveType='" + index + "'");
         dh.execute("UPDATE writedropdownplc set valveType='" + index + "'", connect);
-
-        cmbValveSize.getItems().clear();
-        ResultSet rs = dh.getData("SELECT valve_size FROM valve_size WHERE AVK_Model='" + cmbValveType.getSelectionModel().getSelectedItem() + "' Order BY valve_size_id ASC ", connect);
-
-        while (rs.next()) {
-            cmbValveSize.getItems().add(rs.getString("valve_size"));
-        }
     }
 
     @FXML
