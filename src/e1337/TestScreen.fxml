@@ -35,7 +35,7 @@
                         </ImageView>
                         <VBox alignment="CENTER" prefHeight="73.0" prefWidth="1023.0">
                             <children>
-                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="VALVE TESTING UNIT">
+                                <Text fx:id="lableTitle" strokeType="OUTSIDE" strokeWidth="0.0" text="VALVE TESTING UNIT">
                                     <font>
                                         <Font name="Candara Bold" size="29.0" />
                                     </font>
@@ -106,6 +106,15 @@
                                 </JFXButton>
                             </children>
                         </VBox>
+                  <VBox alignment="CENTER" prefHeight="42.0" prefWidth="219.0">
+                     <children>
+                        <JFXButton fx:id="btnAlarm" onAction="#btnAlarmAction" prefHeight="35.0" prefWidth="187.0" text="System Check/Alarm" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="16.0" />
+                           </font>
+                        </JFXButton>
+                     </children>
+                  </VBox>
                         <VBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0">
                             <children>
                                 <JFXButton fx:id="btnAdmin" onAction="#btnAdminAction" prefHeight="32.0" prefWidth="93.0" text="ADMIN" textFill="WHITE">

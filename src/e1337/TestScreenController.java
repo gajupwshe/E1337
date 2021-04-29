@@ -254,17 +254,25 @@ public class TestScreenController implements Initializable {
 
     @FXML
     private JFXDrawer drawer;
+    @FXML
+    private Text lableTitle;
+    @FXML
+    private JFXButton btnAlarm;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
         radiobar.setToggleGroup(group_select);
         GaugeActualHydraulic.setVisible(false);
+        drawer.setVisible(false);
         radiobar.setSelected(true);
+        txtunithydraulic.setText("bar");
+        txtunithydro.setText("bar");
+        pu = "bar";
         radiokg.setToggleGroup(group_select);
         radiopsi.setToggleGroup(group_select);
         txtAllowable.setVisible(false);
-        btngauge.setVisible(false);
+        btngauge.setVisible(true);
 
         //set Editable false some testing parameter
         txtCycleStatus.setEditable(false);
@@ -286,6 +294,12 @@ public class TestScreenController implements Initializable {
         } else {
             btnAdmin.setVisible(false);
         }
+        if (Session.get("mt").equals("16MT")) {
+            lableTitle.setText("VALVE TESTING UNIT - 16MT");
+        } else if (Session.get("mt").equals("90MT")) {
+            lableTitle.setText("VALVE TESTING UNIT - 90MT");
+        }
+
         date_time();
         Background_Processes.insert_plc_data("python E:\\E1337\\python_plc\\insert_init_test_tag.py", false, true);
         String user_name = Session.get("user");
@@ -300,7 +314,6 @@ public class TestScreenController implements Initializable {
             txtHoldingTimer.setEditable(true);
 
 //            txtremark.setDisable(false);
-            Gaugehydro.setVisible(false);
             textHydro.setVisible(false);
 //            hboxtrend.setVisible(false);
 //            textTrend.setVisible(false);
@@ -589,7 +602,7 @@ public class TestScreenController implements Initializable {
         txtPcd.setEditable(true);
         txtDocNo.setEditable(true);
         txtAllowable.setEditable(true);
-        
+
         radiobar.setDisable(true);
         radiokg.setDisable(true);
         radiopsi.setDisable(true);
@@ -1086,13 +1099,13 @@ public class TestScreenController implements Initializable {
 //                                String sp = " insert_test_init_sp('" + tt + "','NA','" + vt + "','" + vs + "','" + vc + "','" + cmbTypeOfSealing.getSelectionModel().getSelectedItem() + "','" + ts + "','" + st + "','" + ht + "','NA','" + dt + "','" + hsp + "','" + csp + "','" + pu + "','0','" + txtHydroSetPressure.getText() + "','" + txtHydraulicSetPressure.getText() + "','" + vsn + "','NA','NA','NA','" + pro + "','" + cust + "','" + operator_name + "','NA'," + test_no + ",'NA','NA','" + txtBodyHeatno.getText() + "','" + cmbPressuregage.getSelectionModel().getSelectedItem() + "','" + txtvendr.getText() + "','" + txtpono.getText() + "','" + txtjobno.getText() + "')";
 //                                dh.execute_sp(sp, connect);
                             } else {
-                                System.out.println("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW())");
-                                dh.execute("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW())", connect);
+                                System.out.println("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`,`mt`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW()),'" + Session.get("mt") + "'");
+                                dh.execute("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`,`mt`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW()),'" + Session.get("mt") + "'", connect);
                                 //insert data into initia_vala_data
 //                                String sp = " insert_test_init_sp('" + tt + "','NA','" + vt + "','" + vs + "','" + vc + "','" + cmbTypeOfSealing.getSelectionModel().getSelectedItem() + "','" + ts + "','" + st + "','" + ht + "','NA','" + dt + "','" + hsp + "','" + csp + "','" + pu + "','0','" + txtHydroSetPressure.getText() + "','" + txtHydraulicSetPressure.getText() + "','" + vsn + "','NA','NA','NA','" + pro + "','" + cust + "','" + operator_name + "','NA'," + test_no + ",'NA','NA','" + txtBodyHeatno.getText() + "','" + cmbPressuregage.getSelectionModel().getSelectedItem() + "','" + txtvendr.getText() + "','" + txtpono.getText() + "','" + txtjobno.getText() + "')";
 //                                dh.execute_sp(sp, connect);
                             }
-
+                            drawer.setVisible(false);
                             trend_initialize();
                             start_trend();
                             start_trend = true;
@@ -1124,39 +1137,10 @@ public class TestScreenController implements Initializable {
             Optional<ButtonType> option = Dialog.ConfirmationDialog_Single_button("CONFIRMATION", message, width);
             if (option.get() == ButtonType.OK) {
                 try {
-
-                    System.out.println("OK PRESSED");
-                    String cmd = "python E:\\E1257\\python_plc\\write_plc_word.py 18 0 0 ";
-                    System.out.println("cmd..." + cmd);
-                    Process child = Runtime.getRuntime().exec(cmd);
-                    try {
-                        child.waitFor();
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
+//
                     Thread.sleep(100);
                     if (message.equals("Start Hodling Timer")) {
-
-//                        if (Session.get("Test_Type").equals("HYDROSTATIC SEAT C SIDE")) {
-//                            start_pressure_a = pressure_b;
-//                            start_pressure_b = pressure_b;
-//                            start_pressure_c = pressure_a;
-//                            start_pressure_d = pressure_b;
-//                            start_pressure_e = pressure_b;
-//                        } else if (Session.get("Test_Type").equals("HYDROSTATIC SEAT D SIDE")) {
-//                            start_pressure_a = pressure_a;
-//                            start_pressure_b = pressure_a;
-//                            start_pressure_c = pressure_a;
-//                            start_pressure_d = pressure_b;
-//                            start_pressure_e = pressure_a;
-//                        } else if (Session.get("Test_Type").equals("HYDROSTATIC SEAT E SIDE")) {
-//                            start_pressure_a = pressure_b;
-//                            start_pressure_b = pressure_b;
-//                            start_pressure_c = pressure_b;
-//                            start_pressure_d = pressure_b;
-//                            start_pressure_e = pressure_a;
-//                        } else {
+                        dh.execute("UPDATE writedropdownplc set holding='0'", connect);
                         start_pressure_a = pressure_a;
                         start_pressure_b = pressure_b;
                         start_pressure_c = "0";
@@ -1165,11 +1149,16 @@ public class TestScreenController implements Initializable {
 //                        leakageCheck();
 //                        }
                     }
+                    if (message.equals("Start Drain Timer")) {
+                        dh.execute("UPDATE writedropdownplc set drain='0'", connect);
+                    }
                     Session.set("Trend_Status", "Running");
                     check_pop_up();
                 } catch (InterruptedException ex) {
                     System.err.println("Exception in Holding time pop up respond" + ex.getMessage());
                 } catch (IOException ex) {
+                    Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
                     Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -1299,7 +1288,7 @@ public class TestScreenController implements Initializable {
                                             }
                                         } else {
                                             if (delete_count == 0) {
-                                                String delete_query = "DELETE FROM test_result_by_type WHERE valve_serial_no = '" + Session.get("Valve_Serial_No") + "' AND test_type = '" + Session.get("Test_Type") + "' AND test_no = '" + Session.get("test_no") + "';";
+                                                String delete_query = "DELETE FROM test_result_by_type WHERE valve_serial_no = '" + Session.get("Valve_Serial_No") + "' AND test_type = '" + Session.get("Test_Type") + "' AND test_no = '" + test_no + "';";
                                                 try {
                                                     dh.execute(delete_query, connect);
                                                     delete_count++;
@@ -1307,7 +1296,7 @@ public class TestScreenController implements Initializable {
                                                     System.out.println(String.valueOf("Test result by type:  " + e.getMessage()));
                                                 }
                                             }
-                                            String query = "INSERT INTO test_result_by_type (`valve_serial_no`,`test_no`,`test_type`,`hydro_pressure_a_side`,`hydro_pressure_b_side`,`date_time`,`test_count`) VALUES('" + Session.get("Valve_Serial_No") + "','" + Session.get("test_no") + "','" + Session.get("Test_Type") + "','" + pressure_a_side + "','" + pressure_b_side + "',NOW(),'" + test_result_by_type_check + "')";
+                                            String query = "INSERT INTO test_result_by_type (`valve_serial_no`,`test_no`,`test_type`,`hydro_pressure_a_side`,`hydro_pressure_b_side`,`date_time`,`test_count`) VALUES('" + vsn + "','" + test_no + "','" + tt + "','" + pressure_a_side + "','" + pressure_b_side + "',NOW(),'" + test_result_by_type_check + "')";
                                             try {
                                                 dh.execute(query, connect);
                                             } catch (SQLException e) {
@@ -1424,19 +1413,19 @@ public class TestScreenController implements Initializable {
                                     String vs = cmbValveSize.getSelectionModel().getSelectedItem();
                                     String hsp = txtHydroSetPressure.getText();
                                     String psu;
-                                    if (radiobar.isSelected()) {
-                                        psu = "bar";
-                                    } else if (radiopsi.isSelected()) {
-                                        psu = "psi";
-                                    } else {
-                                        psu = "kg/sqcm";
-                                    }
+//                                    if (radiobar.isSelected()) {
+//                                        psu = "bar";
+//                                    } else if (radiopsi.isSelected()) {
+//                                        psu = "psi";
+//                                    } else {
+//                                        psu = "kg/sqcm";
+//                                    }
 
                                     if (test_result_count == 0) {
-                                        String check_data = "SELECT test_result_id,test_no FROM test_result WHERE test_no = '" + Session.get("test_no") + "';";
+                                        String check_data = "SELECT test_result_id,test_no FROM test_result WHERE test_no = '" + test_no + "';";
                                         ResultSet check = dh.getData(check_data, connect);
                                         if (check.next()) {
-                                            String delete_query = "DELETE FROM test_result WHERE test_no = '" + Session.get("test_no") + "';";
+                                            String delete_query = "DELETE FROM test_result WHERE test_no = '" + test_no + "';";
                                             try {
                                                 dh.execute(delete_query, connect);
                                                 delete_count++;
@@ -1460,28 +1449,14 @@ public class TestScreenController implements Initializable {
                                         String stop_pressure_e_side = new DecimalFormat("#").format(Double.parseDouble(stop_pressure_e));
                                         String actLeak = " ";
 
-                                        //for dbb valve
-                                        if (vt.equals("DOUBLE BLOCK BLEED VALVE")) {
-                                            String query1 = "INSERT INTO dbb_test_result (`valve_serial_no`, `test_no`, `test_type`, `leakage_type`, `valve_type`,`valve_size`, `valve_class`, `actual_leakage`, `holding_time`,`overall_time`, `hydro_set_pressure`,`start_pressure_a`,`start_pressure_b`,`start_pressure_c`,`start_pressure_d`,`start_pressure_e`,`stop_pressure_a`,`stop_pressure_b`,`stop_pressure_c`,`stop_pressure_d`,`stop_pressure_e`, `pressure_unit`, `gauge_serial_no`, `guage_calibration_date`, `test_result`, `date_time`) VALUES('" + Session.get("Valve_Serial_No") + "','" + Session.get("test_no") + "','" + Session.get("Test_Type") + "','NA','" + vt + "','" + vs + "','" + vc + "','" + actLeak + "','" + Session.get("holding_time") + "','" + oat + "','" + hsp + "','" + start_pressure_a_side + "','" + start_pressure_b_side + "','" + start_pressure_c_side + "','" + start_pressure_d_side + "','" + start_pressure_e_side + "','" + stop_pressure_a_side + "','" + stop_pressure_b_side + "','" + stop_pressure_c_side + "','" + stop_pressure_d_side + "','" + stop_pressure_e_side + "','" + psu + "','" + Session.get("gauge_serial") + "','" + Session.get("gauge_calibration_date") + "','" + result + "',NOW())";
-                                            try {
-                                                dh.execute(query1, connect);
-                                                test_result_count++;
-                                            } catch (SQLException e) {
-                                                e.printStackTrace();
-                                                System.out.println(String.valueOf("TEST RESULT DBB : " + e.getMessage()));
-                                            }
-
-                                        } else {
-                                            String query = "INSERT INTO test_result (`valve_serial_no`, `test_no`, `test_type`, `leakage_type`, `valve_type`,`valve_size`, `valve_class`, `actual_leakage`, `holding_time`,`over_all_time`, `hydro_set_pressure`,`start_pressure_a`,`start_pressure_b`,`stop_pressure_a`,`stop_pressure_b`, `pressure_unit`, `gauge_serial_no`, `guage_calibration_date`, `test_result`, `date_time`) VALUES('" + vsn + "','" + test_no + "','" + cmbTestType.getSelectionModel().getSelectedItem() + "','" + cmbLeakageType.getSelectionModel().getSelectedItem() + "','" + vt + "','" + vs + "','" + vc + "','" + txtAtcualBubble.getText() + "','" + holding_time + "','" + overall_time_end + "','" + hsp + "','" + start_pressure_a_side + "','" + start_pressure_b_side + "','" + stop_pressure_a_side + "','" + stop_pressure_b_side + "','" + psu + "','" + cmbPressuregage.getSelectionModel().getSelectedItem() + "','NA','" + result + "',NOW())";
-                                            System.out.println("query test result : " + query);
-                                            try {
-                                                dh.execute(query, connect);
-                                                test_result_count++;
-                                            } catch (SQLException e) {
-                                                e.printStackTrace();
-                                                System.out.println(String.valueOf("TEST RESULT : " + e.getMessage()));
-                                            }
-
+                                        String query = "INSERT INTO test_result (`valve_serial_no`, `test_no`, `test_type`, `leakage_type`, `valve_type`,`valve_size`, `valve_class`, `actual_leakage`, `holding_time`,`over_all_time`, `hydro_set_pressure`,`start_pressure_a`,`start_pressure_b`,`stop_pressure_a`,`stop_pressure_b`, `pressure_unit`, `gauge_serial_no`, `guage_calibration_date`, `test_result`, `date_time`,`mt`) VALUES('" + vsn + "','" + test_no + "','" + cmbTestType.getSelectionModel().getSelectedItem() + "','" + cmbLeakageType.getSelectionModel().getSelectedItem() + "','" + vt + "','" + vs + "','" + vc + "','" + txtAtcualBubble.getText() + "','" + holding_time + "','" + overall_time_end + "','" + hsp + "','" + start_pressure_a_side + "','" + start_pressure_b_side + "','" + stop_pressure_a_side + "','" + stop_pressure_b_side + "','" + pu + "','" + cmbPressuregage.getSelectionModel().getSelectedItem() + "','NA','" + result + "',NOW(),'" + Session.get("mt") + "')";
+                                        System.out.println("query test result : " + query);
+                                        try {
+                                            dh.execute(query, connect);
+                                            test_result_count++;
+                                        } catch (SQLException e) {
+                                            e.printStackTrace();
+                                            System.out.println(String.valueOf("TEST RESULT : " + e.getMessage()));
                                         }
 
                                     }
@@ -1583,15 +1558,9 @@ public class TestScreenController implements Initializable {
                 });
                 you_can_change = true;
                 oat = txtOverAllTime.getText();
-//                al = txtActualLeakage.getText();
-//                current_cycle_status = "5";
-                empty_timers();
-//                txtResult.setStyle("-fx-background-color: derive(#FFFFFF,100%); -fx-text-inner-color:black; -fx-font-size: 20px;");
 
-//                stop_mode = true;
-//                stopCycleStatusThread = true;
-//                ();
-//                screen_reopen();
+                empty_timers();
+
                 System.out.println("start_trend LOW");
 
                 current_cycle_status = "5";
@@ -1601,7 +1570,10 @@ public class TestScreenController implements Initializable {
                     cycleStatus.stop();
                 } catch (Exception e) {
                 }
-
+                GaugeActualHydraulic.setVisible(false);
+                Gaugehydro.setVisible(false);
+                drawer.setVisible(false);
+                start_trend = false;
                 break;
             case "6":
                 enable_field();
@@ -1684,24 +1656,20 @@ public class TestScreenController implements Initializable {
     }
 
     private void get_result(String result) {
-        try {
-            if (result.equals("1")) {
+        if (result.equals("1")) {
 
-                txtResult.setStyle(" -fx-text-inner-color:GREEN; -fx-font-size: 20px;");
-                Platform.runLater(() -> {
-                    txtResult.setText("TEST OK");
-                });
-            } else {
-                txtResult.setStyle(" -fx-text-inner-color:RED; -fx-font-size: 20px;");
-                Platform.runLater(() -> {
-                    txtResult.setText("TEST NOT OK");
-                });
-            }
-
-            dh.execute("TRUNCATE TABLE all_tag_read", connect);
-        } catch (SQLException ex) {
-            Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
+            txtResult.setStyle(" -fx-text-inner-color:GREEN; -fx-font-size: 20px;");
+            Platform.runLater(() -> {
+                txtResult.setText("TEST OK");
+            });
+        } else {
+            txtResult.setStyle(" -fx-text-inner-color:RED; -fx-font-size: 20px;");
+            Platform.runLater(() -> {
+                txtResult.setText("TEST NOT OK");
+            });
         }
+
+//            dh.execute("TRUNCATE TABLE all_tag_read", connect);
     }
 
 //    private void pop_up_start_hold(String message, int width, int yes, int no) {
@@ -1832,6 +1800,33 @@ public class TestScreenController implements Initializable {
 //         Runtime.getRuntime().gc();
     }
 
+    @FXML
+    private void btnAlarmAction(ActionEvent event) {
+        if (you_can_change) {
+            try {
+                stopCycleStatusThread = true;
+                stop_mode = true;
+                time.purge();
+                time.cancel();
+                date.cancel();
+                Background_Processes.stop_plc_read();
+            } catch (Exception e) {
+            }
+            Platform.runLater(() -> {
+                try {
+                    Parent root = FXMLLoader.load(getClass().getResource("AlarmScreen.fxml"));
+                    ToolKit.loadScreen(root);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            ToolKit.unloadScreen(btnLogin);
+        } else {
+            Dialog.showForSometime("Alert", "Cycle is running you can;t Go!!!!", "alert", 450, 2);
+        }
+
+    }
+
     private class AddToQueue implements Runnable {
 
         String query = "SELECT * FROM initialinitmain ORDER BY id DESC LIMIT 1";
@@ -1958,7 +1953,7 @@ public class TestScreenController implements Initializable {
     @FXML
     private void btngaugeAction(ActionEvent event) throws IOException {
         //Open Gauge calibration window
-        Parent root = FXMLLoader.load(getClass().getResource("gaugecalibration.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("GaugeCalibration.fxml"));
         Platform.runLater(() -> {
 //                        cmbTestStd.getSelectionModel().select(0);
             catStage = new Stage(StageStyle.UNDECORATED);
@@ -2084,23 +2079,6 @@ public class TestScreenController implements Initializable {
         GaugeActualHydraulic.clearCustomTickLabels();
         GaugeActualHydraulic.setVisible(true);
 
-//        String v_class = cmbValveClass.getSelectionModel().getSelectedItem();
-//        String select_data = "SELECT minimum,green,maximum FROM gauge_range WHERE serial = '" + cmbPressuregage.getSelectionModel().getSelectedItem() + "' AND description='" + cmbValveSize.getSelectionModel().getSelectedItem() + "' AND gauge_range LIKE '" + "%" + uom + "'; ";
-//        System.out.println("select_data : " + select_data);
-//        ResultSet result = dh.getData(select_data, connect);
-//        if (result.next()) {
-//
-//            Gaugehydro.setUnit(uom.toUpperCase());
-//
-//            min = Integer.parseInt(result.getString("minimum"));
-//            green = Integer.parseInt(result.getString("green"));
-//            max = Integer.parseInt(result.getString("maximum"));
-////            }
-//        } else {
-//            min = 0;
-//            max = 0;
-//            green = 0;
-//        }
         try {
             //Hydro gauge visible property
             Gaugehydro.sectionsVisibleProperty().set(true);  //Hydro gauge max value
@@ -2166,50 +2144,45 @@ public class TestScreenController implements Initializable {
     public void bar_psi(int green, int max) {
 
         GaugeActualHydraulic.setMaxValue(max);
-//        GaugeSetHydraulic.setMaxValue(max);
         if (max < 100) {
             if (max % 10 == 0) {
                 Platform.runLater(() -> {
                     GaugeActualHydraulic.setMajorTickSpace(10);
-//                GaugeSetHydraulic.setMajorTickSpace(10);
+
                     GaugeActualHydraulic.setMinorTickSpace(5);
-//                GaugeSetHydraulic.setMinorTickSpace(5);
+
                 });
             } else {
                 int space = max / 10;
                 Platform.runLater(() -> {
                     GaugeActualHydraulic.setMajorTickSpace(max / space);
-//                GaugeSetHydraulic.setMajorTickSpace(max / space);
+                    ;
                 });
             }
         } else if (max > 1000) {
             Platform.runLater(() -> {
                 GaugeActualHydraulic.setMajorTickSpace(max / 1000);
-//            GaugeSetHydraulic.setMajorTickSpace(max / 1000);
+
                 GaugeActualHydraulic.setMinorTickSpace(250);
-//            GaugeSetHydraulic.setMinorTickSpace(250);
+
             });
         } else {
             Platform.runLater(() -> {
                 GaugeActualHydraulic.setMajorTickSpace(max / 100);
-//            GaugeSetHydraulic.setMajorTickSpace(max / 100);
+
                 GaugeActualHydraulic.setMinorTickSpace(50);
-//            GaugeSetHydraulic.setMinorTickSpace(50);
+
             });
         }
 
         //Clamping gauge visible properties
         GaugeActualHydraulic.sectionsVisibleProperty().set(true);
-//        GaugeSetHydraulic.sectionsVisibleProperty().set(true);
-        //Clamping gauge green zone range
+
         Platform.runLater(() -> {
             GaugeActualHydraulic.addSection(new Section(0, green, colors.GaugeGreen));
-//        GaugeSetHydraulic.addSection(new Section(0, green, colors.GaugeGreen));
-            //Clamping gauge red zone range
+
             GaugeActualHydraulic.addSection(new Section(green + 1, max, colors.GaugeRed));
-//        GaugeSetHydraulic.addSection(new Section(green + 1, max, colors.GaugeRed));
-            //Clamping gauge needle color
-//        GaugeSetHydraulic.needleColorProperty().setValue(colors.black);
+
             GaugeActualHydraulic.needleColorProperty().setValue(colors.black);
         });
     }
@@ -2260,16 +2233,12 @@ public class TestScreenController implements Initializable {
         Gaugehydro.clearSections();
         Gaugehydro.setVisible(false);
         start_trend = false;
-//        textTrend.setVisible(false);
         textHydro.setVisible(false);
         textHydro1.setVisible(false);
         hboxtrend.setVisible(false);
-//        hboxTrendText.setVisible(false);
-//        vboxStatus.setVisible(false);
         stop_mode = true;
         you_can = true;
         System.out.println("Trend Low");
-//        Background_Processes.stop_plc_read();
         txtCycleStatus.setText("");
         txtOverAllTime.setText("");
         txtHoldingTime.setText("");
@@ -2281,6 +2250,15 @@ public class TestScreenController implements Initializable {
     @FXML
     private void btnLoginAction(ActionEvent event) {
         if (you_can_change) {
+            try {
+                stopCycleStatusThread = true;
+                stop_mode = true;
+                time.purge();
+                time.cancel();
+                date.cancel();
+                Background_Processes.stop_plc_read();
+            } catch (Exception e) {
+            }
             Platform.runLater(() -> {
                 try {
                     Parent root = FXMLLoader.load(getClass().getResource("Login.fxml"));
@@ -2314,8 +2292,6 @@ public class TestScreenController implements Initializable {
         int index = cmbValveClass.getSelectionModel().getSelectedIndex();
 
         dh.execute("UPDATE writedropdownplc set valveClass='" + index + "'", connect);
-
-//        Gauge_details(cmbValveClass.getSelectionModel().getSelectedItem());
     }
 
     @FXML
@@ -2405,6 +2381,15 @@ public class TestScreenController implements Initializable {
     @FXML
     private void btnReportAction(ActionEvent event) {
         if (you_can_change) {
+            try {
+                stopCycleStatusThread = true;
+                stop_mode = true;
+                time.purge();
+                time.cancel();
+                date.cancel();
+                Background_Processes.stop_plc_read();
+            } catch (Exception e) {
+            }
             Platform.runLater(() -> {
                 try {
                     Parent root = FXMLLoader.load(getClass().getResource("ReportScreen.fxml"));
@@ -2422,6 +2407,15 @@ public class TestScreenController implements Initializable {
     @FXML
     private void btnAdminAction(ActionEvent event) {
         if (you_can_change) {
+            try {
+                stopCycleStatusThread = true;
+                stop_mode = true;
+                time.purge();
+                time.cancel();
+                date.cancel();
+                Background_Processes.stop_plc_read();
+            } catch (Exception e) {
+            }
             Platform.runLater(() -> {
                 try {
                     Parent root = FXMLLoader.load(getClass().getResource("AdminScreen.fxml"));
@@ -2461,19 +2455,6 @@ public class TestScreenController implements Initializable {
 
     @FXML
     private void txtHydroPressureKeyRelease(KeyEvent event) {
-//        ToolKit.validateNumberField(txtHydroSetPressure);
-//        String pressure = txtHydroSetPressure.getText();
-//        try {
-//            if (pressure.equals("")) {
-//
-//            } else {
-//                String cmd = "python E:\\E1257\\python_plc\\write_tag_int.py 52 0 " + pressure;
-//                Process child = Runtime.getRuntime().exec(cmd);
-//                child.waitFor();
-//                System.out.println("cmd id = " + cmd);
-//            }
-//        } catch (Exception e) {
-//        }
 
     }
 
