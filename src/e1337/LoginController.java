@@ -6,6 +6,7 @@
 package e1337;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
@@ -65,6 +66,8 @@ public class LoginController implements Initializable {
     private static String pass = "hydro";
     DatabaseHandler dh = new DatabaseHandler();
     Connection connect = dh.MakeConnection();
+    @FXML
+    private JFXComboBox<String> cmbMachineUnit;
 
     /**
      * Initializes the controller class.
@@ -73,6 +76,7 @@ public class LoginController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         fntunlock.setVisible(false);
+        cmbMachineUnit.getItems().addAll("16MT", "90MT");
 //        export();
     }
 
@@ -124,7 +128,6 @@ public class LoginController implements Initializable {
 
         }
 
-
         String dumpCommand = "C:/wamp64/bin/mysql/mysql5.7.26/bin/mysqldump " + database + " -h " + ip + " -u " + user + " -p" + pass;
         Runtime rt = Runtime.getRuntime();
         File test = new File(path);
@@ -153,62 +156,74 @@ public class LoginController implements Initializable {
     }
 
     public void login() throws SQLException {
+        String mt = cmbMachineUnit.getSelectionModel().getSelectedItem();
+        if (ToolKit.isNull(mt)) {
+            Dialog.showAndWait("Please Select Machine ");
+        } else {
+            
+            Session.set("mt",mt);
 //         String username = txtUser.getText();
-         String password = AES256.encrypt(txtPass.getText());
-        String username = txtUser.getText();
+            String password = AES256.encrypt(txtPass.getText());
+            String username = txtUser.getText();
 //        String password = txtPass.getText();
-        String query = "SELECT * FROM user_data WHERE username = '" + username + "' AND password = '" + password + "';";
+            String query = "SELECT * FROM user_data WHERE username = '" + username + "' AND password = '" + password + "';";
 
-        ResultSet rs = dh.getData(query, connect);
-        if (rs.next()) {
+            ResultSet rs = dh.getData(query, connect);
+            if (rs.next()) {
 
-            try {
-                //                long start = System.currentTimeMillis();
-                String user_type = rs.getString("user_type");
-                InetAddress geek = InetAddress.getByName("192.168.20.243");
+                try {
+                    //                long start = System.currentTimeMillis();
+                    String user_type = rs.getString("user_type");
+                    InetAddress geek = InetAddress.getByName("192.168.20.243");
 //                System.out.println("Sending Ping Request to 192.168.0.1");
-                if (geek.isReachable(500)) {
-                    System.out.println("Host is reachable");
-                    Platform.runLater(() -> {
-                        try {
-                            Parent root = FXMLLoader.load(getClass().getResource("TestScreen.fxml"));
-                            ToolKit.loadScreen(root);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
-                    ToolKit.unloadScreen(btnLogin);
-                } else {
-                    System.out.println("Sorry ! We can't reach to this host");
-                    Dialog.showAndWait("PLC IS NOT CONNECTED..Please Check the Ip Address/Connection");
-                }
+                    if (geek.isReachable(500)) {
+                        System.out.println("Host is reachable");
+                        Platform.runLater(() -> {
+                            try {
+                                Parent root = FXMLLoader.load(getClass().getResource("TestScreen.fxml"));
+                                ToolKit.loadScreen(root);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        ToolKit.unloadScreen(btnLogin);
+                    } else {
+                        System.out.println("Sorry ! We can't reach to this host");
+                        Dialog.showAndWait("PLC IS NOT CONNECTED..Please Check the Ip Address/Connection");
+                    }
 
-                
 //                long stop = System.currentTimeMillis();
 //                System.out.println("Load Iniit "+(stop-start));
-                Session.set("user", username);
-                Session.set("user_type", user_type);
-                if (user_type.equals("admin")) {
-                    Session.set("catAccess", "granted");
-                } else {
-                    Session.set("catAccess", "not granted");
+                    Session.set("user", username);
+                    Session.set("user_type", user_type);
+                    if (user_type.equals("admin")) {
+                        Session.set("catAccess", "granted");
+                    } else {
+                        Session.set("catAccess", "not granted");
+                    }
+                } catch (UnknownHostException ex) {
+                    Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } catch (UnknownHostException ex) {
-                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
-            }
 
-        } else {
-            fntlock.setFill(RED);
-            fntuser.setFill(RED);
-            txtPass.setFocusColor(RED);
-            txtUser.setFocusColor(RED);
-            txtUser.setUnFocusColor(RED);
-            txtPass.setUnFocusColor(RED);
-            fntlock.setVisible(true);
-            fntunlock.setVisible(false);
+            } else {
+                fntlock.setFill(RED);
+                fntuser.setFill(RED);
+                txtPass.setFocusColor(RED);
+                txtUser.setFocusColor(RED);
+                txtUser.setUnFocusColor(RED);
+                txtPass.setUnFocusColor(RED);
+                fntlock.setVisible(true);
+                fntunlock.setVisible(false);
+            }
         }
+    }
+
+    @FXML
+    private void cmbMachineUnitAction(ActionEvent event) {
+        String mt = cmbMachineUnit.getSelectionModel().getSelectedItem();
+        Session.set("mt",mt);
     }
 
 }

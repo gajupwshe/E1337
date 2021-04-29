@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXPasswordField?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
@@ -9,18 +10,19 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="836.0" prefWidth="1608.0" style="-fx-background-color: #edf5f1;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="e1337.LoginController">
+<AnchorPane id="AnchorPane" prefHeight="836.0" prefWidth="1608.0" style="-fx-background-color: #edf5f1;" stylesheets="@combostyle.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="e1337.LoginController">
    <children>
       <ImageView fitHeight="575.0" fitWidth="607.0" layoutX="74.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@image/avk_logo.jpg" />
          </image></ImageView>
-      <JFXTextField fx:id="txtUser" labelFloat="true" layoutX="876.0" layoutY="264.0" prefHeight="28.0" prefWidth="277.0" promptText="User Name" style="-fx-text-fill: #d36115; -fx-prompt-text-fill: #112e61;">
+      <JFXComboBox fx:id="cmbMachineUnit" labelFloat="true" layoutX="876.0" layoutY="213.0" onAction="#cmbMachineUnitAction" prefHeight="30.0" prefWidth="277.0" promptText="Machine" style="-fx-font-weight: bold; -fx-font-size: 15;" unFocusColor="#4059a9" />
+      <JFXTextField fx:id="txtUser" labelFloat="true" layoutX="876.0" layoutY="264.0" prefHeight="28.0" prefWidth="277.0" promptText="User Name">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </JFXTextField>
-      <JFXPasswordField fx:id="txtPass" focusColor="#1655c2" labelFloat="true" layoutX="876.0" layoutY="320.0" onAction="#txtPassAction" prefHeight="35.0" prefWidth="277.0" promptText="Password" style="-fx-text-fill: #d36115; -fx-prompt-text-fill: #112e61;" unFocusColor="#1655c2">
+      <JFXPasswordField fx:id="txtPass" focusColor="#1655c2" labelFloat="true" layoutX="876.0" layoutY="320.0" onAction="#txtPassAction" prefHeight="35.0" prefWidth="277.0" promptText="Password" style="-fx-text-fill: #2478E9;" unFocusColor="#1655c2">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
