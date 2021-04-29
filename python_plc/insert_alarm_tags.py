@@ -16,8 +16,11 @@ db_sp_one = 'alarm_tags_sp'
 
 conn = mysql.connector.connect(host = 'localhost', user = 'root', password = 'hydro', database = 'e1257')
 
+
 #print "connected"
 a = conn.cursor()
+a.callproc('truncate_alarm_tags_sp')
+conn.commit() 
 # a = conn.cursor()
 a.execute('SELECT ip FROM plc_ip')
 
@@ -45,8 +48,10 @@ if __name__=="__main__":
     #ip address of PLC
     plc.connect(ip,0,1)
     machine_mode = ReadMemory(plc,2,0,S7WLWord)
-    A_side_pt = ReadMemory(plc,0,1,S7WLBit)
-    B_side_pt = ReadMemory(plc,0,2,S7WLBit)
+    90_side_pt = ReadMemory(plc,0,1,S7WLBit)
+    16_side_pt = ReadMemory(plc,0,2,S7WLBit)
+    90_side_hydraulic_pt = ReadMemory(plc,0,7,S7WLBit)
+    16_side_hydraulic_pt = ReadMemory(plc,0,8,S7WLBit)
     pre_mot = ReadMemory(plc,68,0,S7WLWord)
     drain_mot = ReadMemory(plc,70,0,S7WLWord)
     hydralic_mot_1 = ReadMemory(plc,72,0,S7WLWord)
@@ -57,7 +62,7 @@ if __name__=="__main__":
 
 	# offline_online = ReadMemory(plc,4,1,S7WLBit)
 
-args = (oil_level,air_inlet,temp,hydralic_mot_1,pre_mot,drain_mot,A_side_pt,B_side_pt,machine_mode,'NA')
+args = (oil_level,air_inlet,temp,hydralic_mot_1,pre_mot,drain_mot,90_side_pt,16_side_pt,machine_mode,90_side_hydraulic_pt,16_side_hydraulic_pt)
 
 print args
 
