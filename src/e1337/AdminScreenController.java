@@ -14,6 +14,7 @@ import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -95,13 +96,11 @@ public class AdminScreenController implements Initializable {
     DatabaseHandler dh = new DatabaseHandler();
     Connection connect = dh.MakeConnection();
 
+    @FXML
     private Text txtMode;
     private Text txtDate;
     private ImageView imgEmergency;
-    @FXML
     private JFXButton btnHome;
-    @FXML
-    private JFXButton btnInitial;
     @FXML
     private JFXButton btnReport;
     @FXML
@@ -242,17 +241,13 @@ public class AdminScreenController implements Initializable {
     private volatile boolean stop_mode = false;
     @FXML
     private Text txtdate;
+    @FXML
     private JFXButton btnLogin;
-    private JFXButton btngauge;
     private JFXButton btnAirPurging;
     @FXML
-    private HBox sectionHeader;
+    private JFXButton btnAlarm;
     @FXML
-    private JFXButton btnTestScreen;
-    @FXML
-    private JFXButton btnSystemCheck;
-    @FXML
-    private JFXButton btnGaugeCal;
+    private JFXButton btnInitial;
 
     private void machine_mode() {
 //        stop_mode = false;
@@ -815,9 +810,9 @@ public class AdminScreenController implements Initializable {
         }
     }
 
-    @FXML
     private void btnHomeAction(ActionEvent event) {
-        dropbox("LoginScreen.fxml", false);
+        
+        
     }
 
     @FXML
@@ -832,7 +827,7 @@ public class AdminScreenController implements Initializable {
 
     @FXML
     private void btnInitialAction(ActionEvent event) {
-        dropbox("InitialScreen.fxml", true);
+        dropbox("TestScreen.fxml", true);
     }
 
     @FXML
@@ -1133,7 +1128,6 @@ public class AdminScreenController implements Initializable {
         }
     }
 
-    @FXML
     private void btnSystemCheckAction(ActionEvent event) {
         dropbox("AlarmScreen.fxml", false);
     }
@@ -1480,10 +1474,9 @@ public class AdminScreenController implements Initializable {
         refreshTableProject();
     }
 
-    private void btnHelpAction(ActionEvent event) {
-        ToolKit.excecuteScript("xdg-open /opt/380mtManual.pdf");
-    }
+   
 
+    @FXML
     private void btnLoginAction(ActionEvent event) {
         Platform.runLater(() -> {
             try {
@@ -1496,7 +1489,6 @@ public class AdminScreenController implements Initializable {
         ToolKit.unloadScreen(btnLogin);
     }
 
-    @FXML
     private void btnTestScreenAction(ActionEvent event) {
         Platform.runLater(() -> {
             try {
@@ -1510,7 +1502,16 @@ public class AdminScreenController implements Initializable {
     }
 
     @FXML
-    private void btnGaugeCalAction(ActionEvent event) {
+    private void btnAlarmAction(ActionEvent event) {
+        Platform.runLater(() -> {
+                try {
+                    Parent root = FXMLLoader.load(getClass().getResource("AlarmScreen.fxml"));
+                    ToolKit.loadScreen(root);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            ToolKit.unloadScreen(btnLogin);
     }
 
 
