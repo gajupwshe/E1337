@@ -27,7 +27,7 @@
                   </ImageView>
                   <VBox alignment="CENTER" prefHeight="73.0" prefWidth="1023.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="VALVE TESTING UNIT">
+                        <Text fx:id="lableTitle" strokeType="OUTSIDE" strokeWidth="0.0" text="VALVE TESTING UNIT">
                            <font>
                               <Font name="Candara Bold" size="29.0" />
                            </font>
@@ -93,18 +93,18 @@
                         </JFXButton>
                      </children>
                   </VBox>
-                  <VBox alignment="CENTER" prefHeight="42.0" prefWidth="219.0">
+                  <VBox alignment="CENTER" prefHeight="41.0" prefWidth="223.0" style="-fx-background-color: #42d7f5;">
                      <children>
-                        <JFXButton fx:id="btnAlarm" onAction="#btnAlarmAction" prefHeight="35.0" prefWidth="187.0" text="System Check/Alarm" textFill="WHITE">
+                        <JFXButton fx:id="btnReport" onAction="#btnReportAction" style="-fx-background-color: #42d7f5;" text="REPORT" textFill="WHITE">
                            <font>
                               <Font name="System Bold" size="16.0" />
                            </font>
                         </JFXButton>
                      </children>
                   </VBox>
-                  <VBox alignment="CENTER" prefHeight="41.0" prefWidth="223.0" style="-fx-background-color: #42d7f5;">
+                  <VBox alignment="CENTER" prefHeight="42.0" prefWidth="219.0">
                      <children>
-                        <JFXButton fx:id="btnReport" onAction="#btnReportAction" style="-fx-background-color: #42d7f5;" text="REPORT" textFill="WHITE">
+                        <JFXButton fx:id="btnAlarm" onAction="#btnAlarmAction" prefHeight="35.0" prefWidth="187.0" text="System Check/Alarm" textFill="WHITE">
                            <font>
                               <Font name="System Bold" size="16.0" />
                            </font>
