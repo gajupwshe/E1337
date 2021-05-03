@@ -672,6 +672,15 @@
                   </JFXDrawer>
                     </children>
                 </HBox>
+            <HBox fx:id="hboxError" alignment="CENTER" prefHeight="45.0" prefWidth="1459.0" style="-fx-background-color: red;">
+               <children>
+                  <Text fx:id="lableError" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
             </children>
         </VBox>
     </children>
