@@ -39,7 +39,7 @@
                   </ImageView>
                   <VBox alignment="CENTER" prefHeight="73.0" prefWidth="1023.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="VALVE TESTING UNIT">
+                        <Text fx:id="lableTitle" strokeType="OUTSIDE" strokeWidth="0.0" text="VALVE TESTING UNIT">
                            <font>
                               <Font name="Candara Bold" size="29.0" />
                            </font>
