@@ -76,11 +76,13 @@ public class ReportScreenController implements Initializable {
     @FXML
     private JFXButton btnInitial;
 
-    private JFXButton btnAirPurging;
+    
     @FXML
     private JFXButton btnAlarm;
     @FXML
     private Text txtMode;
+    @FXML
+    private Text lableTitle;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -96,12 +98,7 @@ public class ReportScreenController implements Initializable {
             btnAdmin.setVisible(false);
         }
         String user_name = Session.get("user");
-        if (user_name.equals("ctpl")) {
-            btnAirPurging.setVisible(true);
-
-        } else {
-            btnAirPurging.setVisible(false);
-        }
+        
         Session.set("screen", "ReportScreen");
 
         date_time();
@@ -136,28 +133,24 @@ public class ReportScreenController implements Initializable {
             }
         });
 
-        //Initialize intial screen
-        Thread Initialize_Initial = new Thread(() -> {
-            Background_Processes.Initialize_Initial_Screen();
-            System.out.println("Initialized");
-        }, "Initialize_Initial_Screen");
-        Initialize_Initial.setDaemon(true);
-        Initialize_Initial.start();
+//        //Initialize intial screen
+//        Thread Initialize_Initial = new Thread(() -> {
+//            Background_Processes.Initialize_Initial_Screen();
+//            System.out.println("Initialized");
+//        }, "Initialize_Initial_Screen");
+//        Initialize_Initial.setDaemon(true);
+//        Initialize_Initial.start();
 
 //        
         webReport.getEngine().setOnAlert((WebEvent<String> arg0) -> {
+            System.out.println("pressed");
             System.out.println(webEngine.locationProperty().getValue());
             String[] pdf_split = arg0.getData().split("_split_");
+            System.out.println("pdf_split :" +pdf_split[0]);
             if (pdf_split[0].equals("PDF SAVED SUCCESSFULLY")) {
                 try {
                     System.out.println(" saved");
                     Dialog.showAndWait(arg0.getData());
-                    //Transfer Folder to Desktop
-                    Runtime run = Runtime.getRuntime();
-//                    Process child = run.exec("rm -r /home/hydro-380/Desktop/Reports/Pdf/");
-//                    child.waitFor();
-                    Process child1 = run.exec("cp -r /opt/lampp/htdocs/Scuff_1079/reports/ /home/ctpl/Desktop/Report/");
-                    child1.waitFor();
                 } catch (Exception ex) {
                     Logger.getLogger(ReportScreenController.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -167,19 +160,15 @@ public class ReportScreenController implements Initializable {
                 String[] split2 = split[1].split("&");
                 System.out.println(split2[0]);
                 String testNo = split2[0];
-                Runtime run = Runtime.getRuntime();
-                try {
-//                    Process child = run.exec("python /opt/share/E948/TestWare/include/plot.py " + DatabaseHandler.DB_HOST + " " + DatabaseHandler.DB_USER + " " + DatabaseHandler.DB_PASS + " " + DatabaseHandler.DB_NAME + " " + testNo);
-//                    System.out.println("python /opt/share/E948/TestWare/include/plot.py " + DatabaseHandler.DB_HOST + " " + DatabaseHandler.DB_USER + " " + DatabaseHandler.DB_PASS + " " + DatabaseHandler.DB_NAME + " " + testNo);
-//                    child.waitFor(5, TimeUnit.SECONDS);
-                } catch (Exception e) {
-
-                }
-//                Dialog.showAndWait("graph");
-
+              
             }
 
         });
+        if (Session.get("mt").equals("16MT")) {
+            lableTitle.setText("VALVE TESTING UNIT - 16MT");
+        } else if (Session.get("mt").equals("90MT")) {
+            lableTitle.setText("VALVE TESTING UNIT - 90MT");
+        }
     }
 
     private void date_time() {
