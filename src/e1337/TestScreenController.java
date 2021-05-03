@@ -258,6 +258,10 @@ public class TestScreenController implements Initializable {
     private Text lableTitle;
     @FXML
     private JFXButton btnAlarm;
+    @FXML
+    private Text lableError;
+    @FXML
+    private HBox hboxError;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -963,38 +967,94 @@ public class TestScreenController implements Initializable {
         mode.start();
     }
 
-    private void mode(String mode) {
+    private void mode(String mode) throws IOException, SQLException {
 
         switch (mode) {
             case "0":
+                hboxError.setVisible(true);
                 Platform.runLater(() -> {
                     txtMode.setText("Emergency Mode");
                     current_machine_mode = "0";
                     txtdate.setFill(Color.web("red"));
                     txtMode.setFill(Color.web("red"));
                 });
-
+                lableError.setText("Emergency Applied");
                 break;
             case "1":
+                hboxError.setVisible(true);
+
+//                Background_Processes.insert_plc_once("python E:\\E1337\\python_plc\\insert_alarm_tags.py");
+                String display = "SELECT * FROM alarm_tags ORDER BY alarm_tags_id DESC LIMIT 1";
+                ResultSet rs = dh.getData(display, connect);
+                if (rs.next()) {
+
+                    if (rs.getString("90_side_pt").equals("0")) {
+                        lableError.setText("90MT Machine Pressure Transmiter Disconnected");
+                    } else {
+                        
+                    }
+                    if (rs.getString("oil_level").equals("0")) {
+                       lableError.setText("Oil level is low"); 
+                    } else {
+                       
+                    }
+                    
+                    if (rs.getString("16_side_pt").equals("0")) {
+                        lableError.setText("16MT Machine Pressure Transmiter Disconnected");
+                    } else {
+                        
+                    }
+
+                    if (rs.getString("90_side_hydraulic_pt").equals("0")) {
+                        lableError.setText("90MT Machine Hydraulic Pressure Transmiter Disconnected");
+                    } else {
+                       
+                    }
+                   
+                    if (rs.getString("16_side_hydraulic_pt").equals("0")) {
+                         lableError.setText("16MT Machine Hydraulic Pressure Transmiter Disconnected");
+                    } else {
+                        
+                    }
+                    if (rs.getString("hydraulic_motor").equals("0")) {
+                         lableError.setText("Hydraulic Motor is OFF");
+                    } else {
+                      
+                    }
+                    
+                    if (rs.getString("pre_fiill_motor").equals("0")) {
+                        lableError.setText("Prefilling Motor is OFF");
+                    } else {
+                      
+                    }
+                    
+                    if (rs.getString("drain_motor").equals("0")) {
+                        lableError.setText("Drain Motor is OFF");
+                    } else {
+                      
+                    }
+
+                }
                 Platform.runLater(() -> {
                     txtMode.setText("Alarm Mode");
-//                Platform.runLater(()->{
+                    //                Platform.runLater(()->{
                     current_machine_mode = "1";
                     txtMode.setFill(Color.web("Red"));
                     txtdate.setFill(Color.web("Red"));
-
                 });
+
                 break;
             case "2":
+                hboxError.setVisible(false);
                 Platform.runLater(() -> {
                     txtMode.setText("Manual Mode");
-
                     current_machine_mode = "2";
                     txtdate.setFill(Color.web("#0099FF"));
                     txtMode.setFill(Color.web("#0099FF"));
                 });
                 break;
             case "3":
+                hboxError.setVisible(false);
                 Platform.runLater(() -> {
                     txtMode.setText("Auto Mode");
                     current_machine_mode = "3";
