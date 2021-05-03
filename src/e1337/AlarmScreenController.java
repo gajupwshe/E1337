@@ -74,6 +74,7 @@ public class AlarmScreenController implements Initializable {
     private JFXButton btnInitialScreen;
     @FXML
     private JFXButton btnOilLevel;
+
     /**
      * Initializes the controller class.
      */
@@ -81,10 +82,14 @@ public class AlarmScreenController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         date_time();
         machine_mode();
-        
-    }    
-    
-    
+        if (Session.get("mt").equals("16MT")) {
+            lableTitle.setText("VALVE TESTING UNIT - 16MT");
+        } else if (Session.get("mt").equals("90MT")) {
+            lableTitle.setText("VALVE TESTING UNIT - 90MT");
+        }
+
+    }
+
     private void date_time() {
         time.scheduleAtFixedRate(date, 0, 1000);
     }
@@ -102,13 +107,14 @@ public class AlarmScreenController implements Initializable {
     };
     public static volatile boolean stop_mode = false;
     Thread mode;
+
     private void machine_mode() {
         System.out.println("in machine mode");
         stop_mode = false;
         mode = new Thread(() -> {
             while (true) {
                 try {
-                    
+
                     System.out.println("");
                     Thread.sleep(150);
                     if (stop_mode) {
@@ -121,7 +127,7 @@ public class AlarmScreenController implements Initializable {
 
                         if (rs.getString("machine_mode").equals(current_machine_mode)) {
                         } else {
-                             String value = rs.getString("machine_mode");
+                            String value = rs.getString("machine_mode");
                             Platform.runLater(() -> {
                                 mode(value, btnEmr, current_machine_mode);
                             });
@@ -135,7 +141,7 @@ public class AlarmScreenController implements Initializable {
                             String value = rs.getString("90_side_pt");
                             Platform.runLater(() -> {
                                 pressure_status(value, btnPresTrans90Mt, current_pt1);
-                                
+
                             });
                         }
                         if (rs.getString("oil_level").equals(current_pt1)) {
@@ -143,7 +149,7 @@ public class AlarmScreenController implements Initializable {
                             String value = rs.getString("oil_level");
                             Platform.runLater(() -> {
                                 pressure_status(value, btnOilLevel, current_pt1);
-                                
+
                             });
                         }
                         if (stop_mode) {
@@ -156,13 +162,13 @@ public class AlarmScreenController implements Initializable {
                                 pressure_status(value, btnPresTrans16MT, current_pt2);
                             });
                         }
-                        
+
                         if (rs.getString("90_side_hydraulic_pt").equals(current_pt1)) {
                         } else {
                             String value = rs.getString("90_side_hydraulic_pt");
                             Platform.runLater(() -> {
                                 pressure_status(value, btnHydraulic90MT, current_pt1);
-                                
+
                             });
                         }
                         if (stop_mode) {
@@ -204,8 +210,8 @@ public class AlarmScreenController implements Initializable {
                         }
 
                     }
-                    
-                    String truncat_query="TRUNCATE TABLE alarm_tags";
+
+                    String truncat_query = "TRUNCATE TABLE alarm_tags";
                     dh.execute(truncat_query, connect);
                 } catch (InterruptedException | SQLException e) {
 
@@ -238,8 +244,7 @@ public class AlarmScreenController implements Initializable {
                 break;
         }
     }
-    
-    
+
     private void pressure_status(String status, JFXButton button, String value_changes) {
         switch (status) {
             case "0":
@@ -258,7 +263,7 @@ public class AlarmScreenController implements Initializable {
                 break;
         }
     }
-    
+
     private void motor_status(String status, JFXButton button, String value_changes) {
         switch (status) {
             case "0":
@@ -281,76 +286,75 @@ public class AlarmScreenController implements Initializable {
                 break;
         }
     }
+
     @FXML
     private void btnLoginAction(ActionEvent event) {
-         Platform.runLater(() -> {
-              try {
+        Platform.runLater(() -> {
+            try {
 //                stopCycleStatusThread=true;
-                stop_mode=true;
+                stop_mode = true;
                 time.purge();
                 time.cancel();
                 date.cancel();
                 Background_Processes.stop_plc_read();
             } catch (Exception e) {
             }
-                try {
-                    Parent root = FXMLLoader.load(getClass().getResource("Login.fxml"));
-                    ToolKit.loadScreen(root);
-                     stop_mode=true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            ToolKit.unloadScreen(btnLogin);
+            try {
+                Parent root = FXMLLoader.load(getClass().getResource("Login.fxml"));
+                ToolKit.loadScreen(root);
+                stop_mode = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        ToolKit.unloadScreen(btnLogin);
     }
-
 
     @FXML
     private void btnReportAction(ActionEvent event) {
         Platform.runLater(() -> {
-             try {
+            try {
 //                stopCycleStatusThread=true;
-                stop_mode=true;
+                stop_mode = true;
                 time.purge();
                 time.cancel();
                 date.cancel();
                 Background_Processes.stop_plc_read();
             } catch (Exception e) {
             }
-                try {
-                    Parent root = FXMLLoader.load(getClass().getResource("ReportScreen.fxml"));
-                    ToolKit.loadScreen(root);
-                     stop_mode=true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            ToolKit.unloadScreen(btnLogin);
+            try {
+                Parent root = FXMLLoader.load(getClass().getResource("ReportScreen.fxml"));
+                ToolKit.loadScreen(root);
+                stop_mode = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        ToolKit.unloadScreen(btnLogin);
     }
 
     @FXML
     private void btnAdminAction(ActionEvent event) {
-         Platform.runLater(() -> {
-              try {
+        Platform.runLater(() -> {
+            try {
 //                stopCycleStatusThread=true;
-                stop_mode=true;
+                stop_mode = true;
                 time.purge();
                 time.cancel();
                 date.cancel();
                 Background_Processes.stop_plc_read();
             } catch (Exception e) {
             }
-                try {
-                    Parent root = FXMLLoader.load(getClass().getResource("AdminScreen.fxml"));
-                    ToolKit.loadScreen(root);
-                     stop_mode=true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            ToolKit.unloadScreen(btnLogin);
+            try {
+                Parent root = FXMLLoader.load(getClass().getResource("AdminScreen.fxml"));
+                ToolKit.loadScreen(root);
+                stop_mode = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        ToolKit.unloadScreen(btnLogin);
     }
-
 
     @FXML
     private void btnAlarmAction(ActionEvent event) {
@@ -358,27 +362,26 @@ public class AlarmScreenController implements Initializable {
 
     @FXML
     private void btnInitialScreenAction(ActionEvent event) {
-         Platform.runLater(() -> {
-              try {
-                
-                stop_mode=true;
+        Platform.runLater(() -> {
+            try {
+
+                stop_mode = true;
                 time.purge();
                 time.cancel();
                 date.cancel();
                 Background_Processes.stop_plc_read();
             } catch (Exception e) {
             }
-                try {
-                       
-                    Parent root = FXMLLoader.load(getClass().getResource("TestScreen.fxml"));
-                    ToolKit.loadScreen(root);
-                  
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            ToolKit.unloadScreen(btnLogin);
+            try {
+
+                Parent root = FXMLLoader.load(getClass().getResource("TestScreen.fxml"));
+                ToolKit.loadScreen(root);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        ToolKit.unloadScreen(btnLogin);
     }
 
-    
 }
