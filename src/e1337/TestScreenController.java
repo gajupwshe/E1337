@@ -371,8 +371,8 @@ public class TestScreenController implements Initializable {
 
         Initial_Dropdowns_Data();
         //VALVE CLASS SIZE
-
-        valve_class_size(cmbValveSize.getSelectionModel().getSelectedItem());
+        System.out.println("cmbValveType.getSelectionModel().getSelectedItem()");
+        valve_class(cmbValveType.getSelectionModel().getSelectedItem());
 
         //if previous data exist
         //setting data
@@ -402,7 +402,8 @@ public class TestScreenController implements Initializable {
                 cmbValveType.getSelectionModel().select(Integer.parseInt(rs1.getString("valve_type")));
                 cmbTypeOfSealing.getSelectionModel().select(Integer.parseInt(rs1.getString("type_of_sealing")));
                 cmbTestStd.getSelectionModel().select(Integer.parseInt(rs1.getString("test_standards")));
-
+                valve_size(cmbValveType.getSelectionModel().getSelectedItem());
+                cmbValveSize.getSelectionModel().select(Integer.parseInt(rs1.getString("valve_size")));
                 if (rs1.getString("test_standards").equals("3")) {
                     cust_flag = 0;
                     txtHydroSetPressure.setEditable(true);
@@ -431,7 +432,13 @@ public class TestScreenController implements Initializable {
 
             ResultSet rs_data = dh.getData("SELECT * FROM valve_data ORDER BY id DESC LIMIT 1", connect);
             if (rs_data.next()) {
-
+                txtValveSrNo.setText(rs_data.getString("vsn"));
+                txtBodyHeatno.setText(rs_data.getString("bodyHeat"));
+                txtDiscHeatno.setText(rs_data.getString("discHeat"));
+                txtNoOfHole.setText(rs_data.getString("noOfHole"));
+                txtPcd.setText(rs_data.getString("pcd"));
+                txtDocNo.setText(rs_data.getString("docNo"));
+                txtAllowable.setText(rs_data.getString("allowable_leakage"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -447,6 +454,7 @@ public class TestScreenController implements Initializable {
                 if (rs.getString("valve_type") == null || rs.getString("valve_type").equals("")) {
                 } else {
                     cmbValveType.getItems().add(rs.getString("valve_type"));
+                    
                 }
                 if (rs.getString("type_of_sealing") == null || rs.getString("type_of_sealing").equals("")) {
                 } else {
@@ -471,11 +479,11 @@ public class TestScreenController implements Initializable {
 
     }
 
-    private void valve_class_size(String Valve_Standard) throws SQLException {
+    private void valve_class(String Valve_Standard) throws SQLException {
         cmbValveClass.getSelectionModel().clearSelection();
-        cmbValveSize.getSelectionModel().clearSelection();
+//        cmbValveSize.getSelectionModel().clearSelection();
         cmbValveClass.getItems().clear();
-        cmbValveSize.getItems().clear();
+//        cmbValveSize.getItems().clear();
         //Valve_class
         String vc = "SELECT vc.valve_class FROM valve_class vc;";
         System.out.println(vc);
@@ -486,17 +494,25 @@ public class TestScreenController implements Initializable {
                 cmbValveClass.getItems().add(rs_vc.getString("valve_class"));
             }
         }
-        //Valve_size
-        String vs = "SELECT vs.valve_size FROM valve_size vs WHERE vs.AVK_Model = '" + Valve_Standard + "';";
-        System.out.println(vs);
-        ResultSet rs_vs = dh.getData(vs, connect);
-        while (rs_vs.next()) {
-            if (rs_vs.getString("valve_size") == null || rs_vs.getString("valve_size").equals("")) {
-            } else {
+    }
 
-                cmbValveSize.getItems().add(rs_vs.getString("valve_size"));
+    private void valve_size(String Valve_Standard) {
 
+        try {
+            //Valve_size
+            String vs = "SELECT vs.valve_size FROM valve_size vs WHERE vs.AVK_Model = '" + Valve_Standard + "';";
+            System.out.println(vs);
+            ResultSet rs_vs = dh.getData(vs, connect);
+            while (rs_vs.next()) {
+                if (rs_vs.getString("valve_size") == null || rs_vs.getString("valve_size").equals("")) {
+                } else {
+
+                    cmbValveSize.getItems().add(rs_vs.getString("valve_size"));
+
+                }
             }
+        } catch (SQLException ex) {
+            Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -991,47 +1007,47 @@ public class TestScreenController implements Initializable {
                     if (rs.getString("90_side_pt").equals("0")) {
                         lableError.setText("90MT Machine Pressure Transmiter Disconnected");
                     } else {
-                        
+
                     }
                     if (rs.getString("oil_level").equals("0")) {
-                       lableError.setText("Oil level is low"); 
+                        lableError.setText("Oil level is low");
                     } else {
-                       
+
                     }
-                    
+
                     if (rs.getString("16_side_pt").equals("0")) {
                         lableError.setText("16MT Machine Pressure Transmiter Disconnected");
                     } else {
-                        
+
                     }
 
                     if (rs.getString("90_side_hydraulic_pt").equals("0")) {
                         lableError.setText("90MT Machine Hydraulic Pressure Transmiter Disconnected");
                     } else {
-                       
+
                     }
-                   
+
                     if (rs.getString("16_side_hydraulic_pt").equals("0")) {
-                         lableError.setText("16MT Machine Hydraulic Pressure Transmiter Disconnected");
+                        lableError.setText("16MT Machine Hydraulic Pressure Transmiter Disconnected");
                     } else {
-                        
+
                     }
                     if (rs.getString("hydraulic_motor").equals("0")) {
-                         lableError.setText("Hydraulic Motor is OFF");
+                        lableError.setText("Hydraulic Motor is OFF");
                     } else {
-                      
+
                     }
-                    
+
                     if (rs.getString("pre_fiill_motor").equals("0")) {
                         lableError.setText("Prefilling Motor is OFF");
                     } else {
-                      
+
                     }
-                    
+
                     if (rs.getString("drain_motor").equals("0")) {
                         lableError.setText("Drain Motor is OFF");
                     } else {
-                      
+
                     }
 
                 }
@@ -1509,7 +1525,7 @@ public class TestScreenController implements Initializable {
                                         String stop_pressure_e_side = new DecimalFormat("#").format(Double.parseDouble(stop_pressure_e));
                                         String actLeak = " ";
 
-                                        String query = "INSERT INTO test_result (`valve_serial_no`, `test_no`, `test_type`, `leakage_type`, `valve_type`,`valve_size`, `valve_class`, `actual_leakage`, `holding_time`,`over_all_time`, `hydro_set_pressure`,`start_pressure_a`,`start_pressure_b`,`stop_pressure_a`,`stop_pressure_b`, `pressure_unit`, `gauge_serial_no`, `guage_calibration_date`, `test_result`, `date_time`,`mt`) VALUES('" + vsn + "','" + test_no + "','" + cmbTestType.getSelectionModel().getSelectedItem() + "','" + cmbLeakageType.getSelectionModel().getSelectedItem() + "','" + vt + "','" + vs + "','" + vc + "','" + txtAtcualBubble.getText() + "','" + holding_time + "','" + overall_time_end + "','" + hsp + "','" + start_pressure_a_side + "','" + start_pressure_b_side + "','" + stop_pressure_a_side + "','" + stop_pressure_b_side + "','" + pu + "','" + cmbPressuregage.getSelectionModel().getSelectedItem() + "','NA','" + result + "',NOW(),'" + Session.get("mt") + "')";
+                                        String query = "INSERT INTO test_result (`valve_serial_no`, `test_no`, `test_type`, `leakage_type`, `valve_type`,`valve_size`, `valve_class`, `actual_leakage`, `holding_time`,`over_all_time`, `hydro_set_pressure`,`start_pressure_a`,`start_pressure_b`,`stop_pressure_a`,`stop_pressure_b`, `pressure_unit`, `gauge_serial_no`, `guage_calibration_date`, `test_result`, `date_time`,`mt`) VALUES('" + vsn + "','" + test_no + "','" + cmbTestType.getSelectionModel().getSelectedItem() + "','" + cmbLeakageType.getSelectionModel().getSelectedItem() + "','" + vt + "','" + vs + "','" + vc + "','" + txtAtcualBubble.getText() + "','" + holding_time + "','" + overall_time_end + "','" + hsp + "','" + start_pressure_a_side + "','" + start_pressure_b_side + "','" + stop_pressure_a_side + "','" + stop_pressure_b_side + "','" + pu+ "','" + cmbPressuregage.getSelectionModel().getSelectedItem() + "','NA','" + result + "',NOW(),'" + Session.get("mt") + "')";
                                         System.out.println("query test result : " + query);
                                         try {
                                             dh.execute(query, connect);
@@ -2340,6 +2356,7 @@ public class TestScreenController implements Initializable {
         dh.execute("UPDATE writedropdownplc set valveType='" + index + "'", connect);
 
         cmbValveSize.getItems().clear();
+        System.out.println("SELECT valve_size FROM valve_size WHERE AVK_Model='" + cmbValveType.getSelectionModel().getSelectedItem() + "' Order BY valve_size_id ASC");
         ResultSet rs = dh.getData("SELECT valve_size FROM valve_size WHERE AVK_Model='" + cmbValveType.getSelectionModel().getSelectedItem() + "' Order BY valve_size_id ASC ", connect);
 
         while (rs.next()) {

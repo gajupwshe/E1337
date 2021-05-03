@@ -2,16 +2,16 @@ import snap7.client as c
 from snap7.util import *
 from snap7.snap7types import *
 import sys, getopt
-import mysql.connector
+# import mysql.connector
 
 
-ip=''
+ip='192.168.20.1'
 conn = mysql.connector.connect(host = 'localhost', user = 'root', password = 'hydro', database = 'e1257')
 a = conn.cursor()
-a.execute('SELECT ip FROM plc_ip')
+# a.execute('SELECT ip FROM plc_ip')
 
-for row in a:
-    ip =row[0]
+# for row in a:
+#     ip =row[0]
 
 byte1 = int(sys.argv[1])
 to= int(sys.argv[2])
