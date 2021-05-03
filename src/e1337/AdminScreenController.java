@@ -248,6 +248,8 @@ public class AdminScreenController implements Initializable {
     private JFXButton btnAlarm;
     @FXML
     private JFXButton btnInitial;
+    @FXML
+    private Text lableTitle;
 
     private void machine_mode() {
 //        stop_mode = false;
@@ -311,8 +313,7 @@ public class AdminScreenController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-      
-       
+
         //Initialize intial screen: Start
         Thread Initialize_Initial = new Thread(() -> {
             Background_Processes.Initialize_Initial_Screen();
@@ -320,36 +321,20 @@ public class AdminScreenController implements Initializable {
         }, "initializeIntialScreenThread");
         Initialize_Initial.setDaemon(true);
         Initialize_Initial.start();
-        //Initialize intial screen: End
 
-//        imgManual.setVisible(false);
-//        imgAuto.setVisible(false);
-//        imgEmergency.setVisible(false);
         current_machine_mode = "45";
         current_offline_mode = "45";
-
-//        btnHome.setFocusTraversable(false);
-//        btnInitial.setFocusTraversable(false);
-//        btnReport.setFocusTraversable(false);
-        //Thread Call INSERT_PLC_DATA : start
-//        Background_Processes.insert_plc_data("python include/insert_admin_report.py " + DatabaseHandler.DB_HOST + " " + DatabaseHandler.DB_USER + " " + DatabaseHandler.DB_PASS + " " + DatabaseHandler.DB_NAME + " truncate_admin_report_sp insert_admin_report_sp", false, true);
-        //Thread Call INSERT_PLC_DATA : End
-        //Thread Call machineMode : start
         machine_mode();
-        //Thread Call machineMode : start
 
-//        Background_Processes.date_time(txtDate, false, false,"adminScreenDateTimeThread");
-        //Tab1: User registration: Start
         Initial_User_registration();
-        //Tab1: User registration: End
 
-        //Tab2: Gauge Start: Start
         Initial_Guage_table();
-        //Tab2: Gauge Start: End
-
-        //Tab2: Master List: Start
-//        intialCMP();
-        //Tab2: Master List: End
+        
+        if (Session.get("mt").equals("16MT")) {
+            lableTitle.setText("VALVE TESTING UNIT - 16MT");
+        } else if (Session.get("mt").equals("90MT")) {
+            lableTitle.setText("VALVE TESTING UNIT - 90MT");
+        }
     }
 
     private void intialCMP() {
@@ -803,7 +788,7 @@ public class AdminScreenController implements Initializable {
                     e.printStackTrace();
                 }
             });
-            ToolKit.unloadScreen(btnHome);
+            ToolKit.unloadScreen(btnAddUpdate);
 
         } catch (Exception ex) {
             Logger.getLogger(AdminScreenController.class.getName()).log(Level.SEVERE, null, ex);
@@ -811,8 +796,7 @@ public class AdminScreenController implements Initializable {
     }
 
     private void btnHomeAction(ActionEvent event) {
-        
-        
+
     }
 
     @FXML
@@ -1474,8 +1458,6 @@ public class AdminScreenController implements Initializable {
         refreshTableProject();
     }
 
-   
-
     @FXML
     private void btnLoginAction(ActionEvent event) {
         Platform.runLater(() -> {
@@ -1504,16 +1486,15 @@ public class AdminScreenController implements Initializable {
     @FXML
     private void btnAlarmAction(ActionEvent event) {
         Platform.runLater(() -> {
-                try {
-                    Parent root = FXMLLoader.load(getClass().getResource("AlarmScreen.fxml"));
-                    ToolKit.loadScreen(root);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-            ToolKit.unloadScreen(btnLogin);
+            try {
+                Parent root = FXMLLoader.load(getClass().getResource("AlarmScreen.fxml"));
+                ToolKit.loadScreen(root);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        ToolKit.unloadScreen(btnLogin);
     }
-
 
     class Users extends RecursiveTreeObject<Users> {
 
