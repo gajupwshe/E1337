@@ -25,6 +25,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 /**
@@ -81,13 +82,13 @@ public class AlarmScreenController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         date_time();
+//        Background_Processes.insert_plc_data("python E:\\E1337\\python_plc\\insert_alarm_tags.py", false, true);
         machine_mode();
         if (Session.get("mt").equals("16MT")) {
             lableTitle.setText("VALVE TESTING UNIT - 16MT");
         } else if (Session.get("mt").equals("90MT")) {
             lableTitle.setText("VALVE TESTING UNIT - 90MT");
         }
-
     }
 
     private void date_time() {
@@ -127,10 +128,11 @@ public class AlarmScreenController implements Initializable {
 
                         if (rs.getString("machine_mode").equals(current_machine_mode)) {
                         } else {
-                            String value = rs.getString("machine_mode");
-                            Platform.runLater(() -> {
-                                mode(value, btnEmr, current_machine_mode);
-                            });
+                            String mac_mode = rs.getString("machine_mode");
+//                            Platform.runLater(() -> {
+//                                mode(value, btnEmr, current_machine_mode);
+//                            });
+                            mode(mac_mode);
                         }
                         if (stop_mode) {
                             break;
@@ -211,8 +213,8 @@ public class AlarmScreenController implements Initializable {
 
                     }
 
-                    String truncat_query = "TRUNCATE TABLE alarm_tags";
-                    dh.execute(truncat_query, connect);
+//                    String truncat_query = "TRUNCATE TABLE alarm_tags";
+//                    dh.execute(truncat_query, connect);
                 } catch (InterruptedException | SQLException e) {
 
                 }
@@ -226,21 +228,56 @@ public class AlarmScreenController implements Initializable {
 
     }
 
-    private void mode(String status, JFXButton button, String value_changes) {
+    private void mode(String status) {
+        System.out.println("status" +status);
         switch (status) {
+            
             case "0":
-                button.setText("OFF");
-                button.setStyle("-fx-background-color:#388e3c");
-                value_changes = "0";
+
+                Platform.runLater(() -> {
+                    txtMode.setText("Emergency Mode");
+                    current_machine_mode = "0";
+                    txtdate.setFill(Color.web("red"));
+                    txtMode.setFill(Color.web("red"));
+                });
+
                 break;
             case "1":
-                button.setText("ON");
-                button.setStyle("-fx-background-color:#ac0800;");
-                value_changes = "1";
+                Platform.runLater(() -> {
+                    txtMode.setText("Alarm Mode");
+                    //                Platform.runLater(()->{
+                    current_machine_mode = "1";
+                    txtMode.setFill(Color.web("Red"));
+                    txtdate.setFill(Color.web("Red"));
+                });
                 break;
 
+            case "2":
+
+                Platform.runLater(() -> {
+                    txtMode.setText("Manual Mode");
+                    current_machine_mode = "2";
+                    txtdate.setFill(Color.web("#0099FF"));
+                    txtMode.setFill(Color.web("#0099FF"));
+                });
+                break;
+            case "3":
+
+                Platform.runLater(() -> {
+                    txtMode.setText("Auto Mode");
+                    current_machine_mode = "3";
+                    txtdate.setFill(Color.web("#0099FF"));
+                    txtMode.setFill(Color.web("#0099FF"));
+
+                });
+                break;
             default:
-                value_changes = "1";
+                Platform.runLater(() -> {
+                    txtMode.setText("Something wrong");
+                    current_machine_mode = "0";
+                    txtdate.setFill(Color.web("#C32420"));
+                });
+
                 break;
         }
     }
