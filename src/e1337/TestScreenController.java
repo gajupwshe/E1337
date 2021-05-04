@@ -999,7 +999,7 @@ public class TestScreenController implements Initializable {
             case "1":
                 hboxError.setVisible(true);
 
-//                Background_Processes.insert_plc_once("python E:\\E1337\\python_plc\\insert_alarm_tags.py");
+                Background_Processes.insert_plc_once("python E:\\E1337\\python_plc\\insert_alarm_tags.py");
                 String display = "SELECT * FROM alarm_tags ORDER BY alarm_tags_id DESC LIMIT 1";
                 ResultSet rs = dh.getData(display, connect);
                 if (rs.next()) {
