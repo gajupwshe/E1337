@@ -44,19 +44,19 @@ public class Dialog {
         });
     }
     
-    public static Optional<ButtonType> ConfirmationDialog(String title, String message, double width) {
-
-        Alert alert = new Alert(Alert.AlertType.NONE, message, ButtonType.YES, ButtonType.NO);
-        alert.getDialogPane().setMinWidth(width);
-//        alert.setTitle(title);
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.setAlwaysOnTop(true);
-        stage.initStyle(StageStyle.UNDECORATED);
-        stage.toFront();
-        Optional<ButtonType> result = alert.showAndWait();
-
-        return result;
-    }
+//    public static Optional<ButtonType> ConfirmationDialog(String title, String message, double width) {
+//
+//        Alert alert = new Alert(Alert.AlertType.NONE, message, ButtonType.YES, ButtonType.NO);
+//        alert.getDialogPane().setMinWidth(width);
+////        alert.setTitle(title);
+//        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+//        stage.setAlwaysOnTop(true);
+//        stage.initStyle(StageStyle.UNDECORATED);
+//        stage.toFront();
+//        Optional<ButtonType> result = alert.showAndWait();
+//
+//        return result;
+//    }
     
     public static Optional<ButtonType> ConfirmationDialog_Single_button(String title, String message, double width) {
 
