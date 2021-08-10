@@ -51,7 +51,9 @@ import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -265,7 +267,7 @@ public class TestScreenController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
+//        hboxTest.setFocusTraversable(true);
         radiobar.setToggleGroup(group_select);
         GaugeActualHydraulic.setVisible(false);
         drawer.setVisible(false);
@@ -305,7 +307,7 @@ public class TestScreenController implements Initializable {
         }
 
         date_time();
-        Background_Processes.insert_plc_data("python E:\\E1337\\python_plc\\insert_init_test_tag.py", false, true);
+//        Background_Processes.insert_plc_data("python E:\\E1337\\python_plc\\insert_init_test_tag.py", false, true);
         String user_name = Session.get("user");
         try {
 
@@ -332,6 +334,8 @@ public class TestScreenController implements Initializable {
         machine_mode();
 
     }
+    public boolean stop_mode = false;
+
     String pu;
     int leak_no, cust_flag = 1, test_no = 1;
 
@@ -454,7 +458,7 @@ public class TestScreenController implements Initializable {
                 if (rs.getString("valve_type") == null || rs.getString("valve_type").equals("")) {
                 } else {
                     cmbValveType.getItems().add(rs.getString("valve_type"));
-                    
+
                 }
                 if (rs.getString("type_of_sealing") == null || rs.getString("type_of_sealing").equals("")) {
                 } else {
@@ -693,10 +697,11 @@ public class TestScreenController implements Initializable {
     }
 
     private void machine_mode() {
+
         mode = new Thread(() -> {
 
             try {
-
+                System.out.println("stop_mode " + stop_mode);
                 String display = "SELECT * FROM initialinitmain ORDER BY id DESC LIMIT 1";
                 ResultSet rs;
                 try {
@@ -717,6 +722,7 @@ public class TestScreenController implements Initializable {
                 while (true) {
 
                     try {
+//                        System.out.println("call machine_mode");
                         long start = System.currentTimeMillis();
                         //Sleeping thread for 250 miliseconds: Starts
                         try {
@@ -729,6 +735,7 @@ public class TestScreenController implements Initializable {
                         //Sleeping thread for 250 miliseconds: End
 
                         if (stop_mode) {
+//                            System.out.println("call machine_mode");
                             break;
                         }
 
@@ -999,7 +1006,7 @@ public class TestScreenController implements Initializable {
             case "1":
                 hboxError.setVisible(true);
 
-                Background_Processes.insert_plc_once("python E:\\E1337\\python_plc\\insert_alarm_tags.py");
+//                Background_Processes.insert_plc_once("python E:\\E1337\\python_plc\\insert_alarm_tags.py");
                 String display = "SELECT * FROM alarm_tags ORDER BY alarm_tags_id DESC LIMIT 1";
                 ResultSet rs = dh.getData(display, connect);
                 if (rs.next()) {
@@ -1153,7 +1160,7 @@ public class TestScreenController implements Initializable {
 
             } else {
                 Platform.runLater(() -> {
-                    Optional<ButtonType> option = Dialog.ConfirmationDialog("CONFIRMATION", message, width);
+                    Optional<ButtonType> option = ConfirmationDialog("CONFIRMATION", message, width);
                     if (option.get() == ButtonType.YES) {
                         try {
                             disable_field();
@@ -1164,24 +1171,25 @@ public class TestScreenController implements Initializable {
 
                             String select_data = "SELECT * FROM `valve_data` ORDER BY id DESC LIMIT 1";
                             ResultSet rs_sele = dh.getData(select_data, connect);
-
+                            String mt = Session.get("mt");
                             if (rs_sele.next()) {
                                 test_no = Integer.parseInt(rs_sele.getString("test_no"));
                                 test_no++;
-                                System.out.println("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW())");
-                                dh.execute("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW())", connect);
+
+                                System.out.println("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`,`mt`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW(),'" + mt + "')");
+                                dh.execute("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`,`mt`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW(),'" + mt + "')", connect);
 
                                 //insert data into initia_vala_data
 //                                String sp = " insert_test_init_sp('" + tt + "','NA','" + vt + "','" + vs + "','" + vc + "','" + cmbTypeOfSealing.getSelectionModel().getSelectedItem() + "','" + ts + "','" + st + "','" + ht + "','NA','" + dt + "','" + hsp + "','" + csp + "','" + pu + "','0','" + txtHydroSetPressure.getText() + "','" + txtHydraulicSetPressure.getText() + "','" + vsn + "','NA','NA','NA','" + pro + "','" + cust + "','" + operator_name + "','NA'," + test_no + ",'NA','NA','" + txtBodyHeatno.getText() + "','" + cmbPressuregage.getSelectionModel().getSelectedItem() + "','" + txtvendr.getText() + "','" + txtpono.getText() + "','" + txtjobno.getText() + "')";
 //                                dh.execute_sp(sp, connect);
                             } else {
-                                System.out.println("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`,`mt`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW()),'" + Session.get("mt") + "'");
-                                dh.execute("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`,`mt`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW()),'" + Session.get("mt") + "'", connect);
+                                System.out.println("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`,`mt`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW(),'" + mt + "')");
+                                dh.execute("INSERT INTO `valve_data`( `test_no`, `test_type`, `valve_standards`, `hydro_set_pressure`, `holding_set`, `allowable_leakage`, `vsn`, `bodyHeat`, `discHeat`, `noOfHole`, `pcd`, `docNo`, `date`,`mt`)VALUES ('" + test_no + "','" + tt + "','NA','" + txtHydroSetPressure.getText() + "','" + txtHoldingTime.getText() + "','" + allowableCount + "','" + vsn + "','" + bodyHeat + "','" + discHeat + "','" + noOfHole + "','" + pcd + "','" + docNo + "',NOW(),'" + mt + "')", connect);
                                 //insert data into initia_vala_data
 //                                String sp = " insert_test_init_sp('" + tt + "','NA','" + vt + "','" + vs + "','" + vc + "','" + cmbTypeOfSealing.getSelectionModel().getSelectedItem() + "','" + ts + "','" + st + "','" + ht + "','NA','" + dt + "','" + hsp + "','" + csp + "','" + pu + "','0','" + txtHydroSetPressure.getText() + "','" + txtHydraulicSetPressure.getText() + "','" + vsn + "','NA','NA','NA','" + pro + "','" + cust + "','" + operator_name + "','NA'," + test_no + ",'NA','NA','" + txtBodyHeatno.getText() + "','" + cmbPressuregage.getSelectionModel().getSelectedItem() + "','" + txtvendr.getText() + "','" + txtpono.getText() + "','" + txtjobno.getText() + "')";
 //                                dh.execute_sp(sp, connect);
                             }
-                            drawer.setVisible(false);
+                            drawer.setVisible(true);
                             trend_initialize();
                             start_trend();
                             start_trend = true;
@@ -1195,6 +1203,9 @@ public class TestScreenController implements Initializable {
                     } else if (option.get() == ButtonType.NO) {
                         try {
                             dh.execute("UPDATE writedropdownplc set cycle_start='4' WHERE id='1' ", connect);
+
+                            first_pop_lock = false;
+                            you_can_change = true;
                         } catch (SQLException ex) {
                             Logger.getLogger(TestScreenController.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -1210,7 +1221,7 @@ public class TestScreenController implements Initializable {
 
     private void pop_up_timer(String message, int width, int ok, String tag) {
         Platform.runLater(() -> {
-            Optional<ButtonType> option = Dialog.ConfirmationDialog_Single_button("CONFIRMATION", message, width);
+            Optional<ButtonType> option = ConfirmationDialog_Single_button("CONFIRMATION", message, width);
             if (option.get() == ButtonType.OK) {
                 try {
 //
@@ -1525,7 +1536,7 @@ public class TestScreenController implements Initializable {
                                         String stop_pressure_e_side = new DecimalFormat("#").format(Double.parseDouble(stop_pressure_e));
                                         String actLeak = " ";
 
-                                        String query = "INSERT INTO test_result (`valve_serial_no`, `test_no`, `test_type`, `leakage_type`, `valve_type`,`valve_size`, `valve_class`, `actual_leakage`, `holding_time`,`over_all_time`, `hydro_set_pressure`,`start_pressure_a`,`start_pressure_b`,`stop_pressure_a`,`stop_pressure_b`, `pressure_unit`, `gauge_serial_no`, `guage_calibration_date`, `test_result`, `date_time`,`mt`) VALUES('" + vsn + "','" + test_no + "','" + cmbTestType.getSelectionModel().getSelectedItem() + "','" + cmbLeakageType.getSelectionModel().getSelectedItem() + "','" + vt + "','" + vs + "','" + vc + "','" + txtAtcualBubble.getText() + "','" + holding_time + "','" + overall_time_end + "','" + hsp + "','" + start_pressure_a_side + "','" + start_pressure_b_side + "','" + stop_pressure_a_side + "','" + stop_pressure_b_side + "','" + pu+ "','" + cmbPressuregage.getSelectionModel().getSelectedItem() + "','NA','" + result + "',NOW(),'" + Session.get("mt") + "')";
+                                        String query = "INSERT INTO test_result (`valve_serial_no`, `test_no`, `test_type`, `leakage_type`, `valve_type`,`valve_size`, `valve_class`, `actual_leakage`, `holding_time`,`over_all_time`, `hydro_set_pressure`,`start_pressure_a`,`start_pressure_b`,`stop_pressure_a`,`stop_pressure_b`, `pressure_unit`, `gauge_serial_no`, `guage_calibration_date`, `test_result`, `date_time`,`mt`) VALUES('" + vsn + "','" + test_no + "','" + cmbTestType.getSelectionModel().getSelectedItem() + "','" + cmbLeakageType.getSelectionModel().getSelectedItem() + "','" + vt + "','" + vs + "','" + vc + "','" + txtAtcualBubble.getText() + "','" + holding_time + "','" + overall_time_end + "','" + hsp + "','" + start_pressure_a_side + "','" + start_pressure_b_side + "','" + stop_pressure_a_side + "','" + stop_pressure_b_side + "','" + pu + "','" + cmbPressuregage.getSelectionModel().getSelectedItem() + "','NA','" + result + "',NOW(),'" + Session.get("mt") + "')";
                                         System.out.println("query test result : " + query);
                                         try {
                                             dh.execute(query, connect);
@@ -1591,6 +1602,41 @@ public class TestScreenController implements Initializable {
 
     }
 
+    private Optional<ButtonType> ConfirmationDialog(String title, String message, double width) {
+
+        Alert alert = new Alert(Alert.AlertType.NONE, message, ButtonType.YES, ButtonType.NO);
+        alert.getDialogPane().setMinWidth(width);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(
+                getClass().getResource("myDialog.css").toExternalForm());
+        dialogPane.getStyleClass().add("myDialog");
+//        alert.setTitle(title);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.setAlwaysOnTop(true);
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.toFront();
+        Optional<ButtonType> result = alert.showAndWait();
+
+        return result;
+    }
+
+    public Optional<ButtonType> ConfirmationDialog_Single_button(String title, String message, double width) {
+        Alert alert = new Alert(Alert.AlertType.NONE, message, ButtonType.OK);
+        alert.getDialogPane().setMinWidth(width);
+//        alert.setTitle(title);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(
+                getClass().getResource("myDialog.css").toExternalForm());
+        dialogPane.getStyleClass().add("myDialog");
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.setAlwaysOnTop(true);
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.toFront();
+        Optional<ButtonType> result = alert.showAndWait();
+
+        return result;
+    }
+
     private void cycle_status(String status) {
         switch (status) {
             case "0":
@@ -1629,6 +1675,9 @@ public class TestScreenController implements Initializable {
                 break;
             case "5":
                 enable_field();
+                Gaugehydro.setVisible(false);
+                GaugeActualHydraulic.setVisible(false);
+                drawer.setVisible(false);
                 Platform.runLater(() -> {
                     txtCycleStatus.setText("CYCLE COMPLETE");
                 });
@@ -1650,6 +1699,7 @@ public class TestScreenController implements Initializable {
                 Gaugehydro.setVisible(false);
                 drawer.setVisible(false);
                 start_trend = false;
+
                 break;
             case "6":
                 enable_field();
@@ -1808,7 +1858,7 @@ public class TestScreenController implements Initializable {
             series2.getData().removeAll();
             series3.getData().removeAll();
             lineChart.setHorizontalGridLinesVisible(true);
-            if (test_type.equals("HYDROSTATIC SHELL") || test_type.equals("BACK SEAT TEST")) {
+            if (test_type.equals("BODY TEST") || test_type.equals("BACK SEAT TEST")) {
                 series1.setName("Hydro Pressure");
                 series3.setName("Hydraulic Pressure");
 
@@ -1885,7 +1935,7 @@ public class TestScreenController implements Initializable {
                 time.purge();
                 time.cancel();
                 date.cancel();
-                Background_Processes.stop_plc_read();
+//                Background_Processes.stop_plc_read();
             } catch (Exception e) {
             }
             Platform.runLater(() -> {
@@ -2264,7 +2314,7 @@ public class TestScreenController implements Initializable {
     }
 
     Thread mode;
-    public static volatile boolean stop_mode = false;
+
     String over_all = "0";
     DoubleProperty HydroAct;
 //    int firstBindingGauge = 0, hold_flag = 0, hold_flag_pop = 0;

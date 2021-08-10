@@ -662,7 +662,8 @@ public class AdminScreenController implements Initializable {
                     if (rs1.next()) {
                         txtName.setText(rs1.getString("name"));
                         txtUserName.setText(rs1.getString("username"));
-                        txtPassword.setText(rs1.getString("password"));
+                        String decryptPass= AES256.decrypt(rs1.getString("password"));
+                        txtPassword.setText(decryptPass);
                         txtQualification.setText(rs1.getString("qualification"));
                         if (rs1.getString("user_type").equals("admin")) {
                             cmbUserType.getSelectionModel().select(1);

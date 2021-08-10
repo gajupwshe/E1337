@@ -103,9 +103,9 @@ public class ReportScreenController implements Initializable {
 
         date_time();
         webEngine = webReport.getEngine();
-        webEngine.load("http://localhost/Report_1377/index.php?db_user=root&db_pass=hydro&db_name=e1337");
+        webEngine.load("http://localhost/Report_1337/index.php?db_user=root&db_pass=hydro&db_name=e1337");
         webEngine.setJavaScriptEnabled(true);
-        System.out.println("http://localhost/Report_1377/index.php?db_user=root&db_pass=hydro&db_name=e1337");
+        System.out.println("http://localhost/Report_1337/index.php?db_user=root&db_pass=hydro&db_name=e1337");
         //Adding Custom Context menu - Start
         webReport.setContextMenuEnabled(false);
         ContextMenu contextMenu = new ContextMenu();

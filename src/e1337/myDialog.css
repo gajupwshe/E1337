@@ -44,7 +44,7 @@
  }*/
 
 .myDialog{
-    -fx-background-color: #d1ddde;
+    -fx-background-color: #4fcfe3;
 }
 .myDialog > *.button-bar > *.container{
     -fx-background-color: #edf9fc;
@@ -52,6 +52,7 @@
 .myDialog > *.label.content{
     -fx-font-size: 14px;
     -fx-font-weight: bold;
+    -fx-text-fill: red;
 }
 
 .myDialog:header *.header-panel{

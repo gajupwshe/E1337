@@ -228,12 +228,12 @@
                                                 <Font name="System Bold" size="14.0" />
                                             </font>
                                         </Text>
-                                        <JFXRadioButton fx:id="radiobar" onAction="#radiobarAction" text="BAR" GridPane.columnIndex="5" GridPane.rowIndex="1">
+                                        <JFXRadioButton fx:id="radiobar" onAction="#radiobarAction" text="BAR" GridPane.columnIndex="3" GridPane.rowIndex="6">
                                             <font>
                                                 <Font name="System Bold" size="13.0" />
                                             </font>
                                         </JFXRadioButton>
-                                        <JFXRadioButton fx:id="radiopsi" onAction="#radiopsiAction" text="PSI" GridPane.columnIndex="5" GridPane.rowIndex="1">
+                                        <JFXRadioButton fx:id="radiopsi" onAction="#radiopsiAction" text="PSI" GridPane.columnIndex="3" GridPane.rowIndex="6">
                                             <GridPane.margin>
                                                 <Insets left="62.0" />
                                             </GridPane.margin>
@@ -241,7 +241,7 @@
                                                 <Font name="System Bold" size="13.0" />
                                             </font>
                                         </JFXRadioButton>
-                                        <JFXRadioButton fx:id="radiokg" onAction="#radiokgAction" prefHeight="16.0" prefWidth="54.0" text="KG/SQ.CM" GridPane.columnIndex="5" GridPane.rowIndex="1">
+                                        <JFXRadioButton fx:id="radiokg" onAction="#radiokgAction" prefHeight="16.0" prefWidth="54.0" text="KG/SQ.CM" GridPane.columnIndex="3" GridPane.rowIndex="6">
                                             <font>
                                                 <Font name="System Bold" size="13.0" />
                                             </font>

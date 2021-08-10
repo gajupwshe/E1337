@@ -77,7 +77,7 @@ public class LoginController implements Initializable {
         // TODO
         fntunlock.setVisible(false);
         cmbMachineUnit.getItems().addAll("16MT", "90MT");
-//        export();
+        export();
     }
 
     @FXML
@@ -129,6 +129,7 @@ public class LoginController implements Initializable {
         }
 
         String dumpCommand = "C:/wamp64/bin/mysql/mysql5.7.26/bin/mysqldump " + database + " -h " + ip + " -u " + user + " -p" + pass;
+        System.out.println("dumpCommand " +dumpCommand);
         Runtime rt = Runtime.getRuntime();
         File test = new File(path);
         PrintStream ps;
